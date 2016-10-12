@@ -1,7 +1,7 @@
-assets/
-example_assets/
-assets_src/
-lib/
+/assets/
+/example_assets/
+/assets_src/
+/lib/
 
 .metadata
 bin/
