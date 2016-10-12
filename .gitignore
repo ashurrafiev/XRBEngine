@@ -1,7 +1,11 @@
 /assets/
 /example_assets/
 /assets_src/
+/lib_src/
 /lib/
+
+*.zip
+*.jar
 
 .metadata
 bin/
