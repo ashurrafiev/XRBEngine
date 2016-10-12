@@ -176,7 +176,7 @@ public class ExampleMenu implements InputHandler {
 			@Override
 			public void onChangeValue(int index) {
 				String s = getValueName();
-				settings.anisotropy = s.equals("Off") ? 0 : Integer.parseInt(s.substring(0, s.length()-1));
+				settings.anisotropy = s.equals("Off") ? 1 : Integer.parseInt(s.substring(0, s.length()-1));
 			}
 		});
 	}

@@ -120,8 +120,8 @@ public class GLLights extends ExampleClient {
 		switch(Keyboard.getEventKey()) {
 			case Keyboard.KEY_F4:
 				if(offscreenBuffers==null) {
-					offscreenBuffers = new OffscreenBuffers(Display.getWidth()/8, Display.getHeight()/8, true);
-					interBuffers = new OffscreenBuffers(Display.getWidth()/8, Display.getHeight()/8, false);
+					offscreenBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), true);
+					interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
 				}
 				else {
 					offscreenBuffers.destroy();
@@ -170,10 +170,7 @@ public class GLLights extends ExampleClient {
 	
 	@Override
 	protected void drawOffscreenBuffers(OffscreenBuffers buffers, RenderTarget target, float dt) {
-		interBuffers.use();
 		postProc.draw(buffers, dt);
-
-		OffscreenBuffers.blit(interBuffers, target, true);
 	}
 	
 	@Override
@@ -181,9 +178,9 @@ public class GLLights extends ExampleClient {
 		super.resizeResources();
 		if(offscreenBuffers!=null) {
 			offscreenBuffers.destroy();
-			offscreenBuffers = new OffscreenBuffers(Display.getWidth()/8, Display.getHeight()/8, true);
+			offscreenBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), true);
 			interBuffers.destroy();
-			interBuffers = new OffscreenBuffers(Display.getWidth()/8, Display.getHeight()/8, false);
+			interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
 		}
 	}
 	
@@ -203,7 +200,6 @@ public class GLLights extends ExampleClient {
 	}
 	
 	public static void main(String[] args) {
-		settings.multisample = 0;
 		new GLLights().init("GLLights").run();
 	}
 

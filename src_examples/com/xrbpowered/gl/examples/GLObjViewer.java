@@ -36,7 +36,7 @@ public class GLObjViewer extends ExampleClient {
 	@Override
 	protected void setupResources() {
 		super.setupResources();
-		texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422)); // new Texture("bricks_n.png");
+		texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422));
 		normal = new Texture("normal.jpg");
 		
 //		mesh = StandardMeshBuilder.sphere(0.5f, 32);
@@ -51,8 +51,6 @@ public class GLObjViewer extends ExampleClient {
 		StandardShader.environment.lightColor.set(1f, 1f, 1f);
 		lightActor.rotation = new Vector3f((float)Math.PI, 0, 0);
 		lightActor.updateTransform();
-		
-//		CLEAR_COLOR = new Color(0.2f, 0.3f, 0.4f, 0f);
 		
 		controller = new Controller().setActor(meshActor);
 		activeController = controller;

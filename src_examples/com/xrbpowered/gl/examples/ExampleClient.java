@@ -306,15 +306,17 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 			framesCount = 0;
 		}
 		
+		RenderTarget drawTarget = target;
 		if(offscreenBuffers!=null) {
 			offscreenBuffers.use();
+			drawTarget = offscreenBuffers;
 		}
 		
 		GL11.glClearColor(CLEAR_COLOR.getRed() / 255f, CLEAR_COLOR.getGreen() / 255f, CLEAR_COLOR.getBlue() / 255f, 0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		if(wireframe)
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-		drawObjects(target, dt);
+		drawObjects(drawTarget, dt);
 		if(wireframe)
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 
