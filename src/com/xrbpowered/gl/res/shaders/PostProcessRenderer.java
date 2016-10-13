@@ -1,9 +1,10 @@
 package com.xrbpowered.gl.res.shaders;
 
+import java.awt.Color;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import com.sun.prism.paint.Color;
 import com.xrbpowered.gl.Renderer;
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
