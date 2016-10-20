@@ -1,8 +1,8 @@
 package com.xrbpowered.gl.res;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.security.InvalidParameterException;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -25,67 +25,46 @@ public class StaticMesh {
 	private int drawMode = GL11.GL_TRIANGLES;
 	
 	public StaticMesh(VertexInfo info, float[] vertexData, short[] indexData) {
-		ByteBuffer vertexBuffer = BufferUtils.createByteBuffer(vertexData.length * 4);
-		vertexBuffer.asFloatBuffer().put(vertexData).flip();
+		this(info, vertexData, indexData, 3, false);
+	}
+	
+	public StaticMesh(VertexInfo info, float[] vertexData, int verticesPerElement, int countElements, boolean dynamic) {
+		this(info, vertexData, null, verticesPerElement, dynamic);
+	}
+	
+	public StaticMesh(VertexInfo info, float[] vertexData, short[] indexData, int verticesPerElement, boolean dynamic) {
+		FloatBuffer vertexBuffer = BufferUtils.createByteBuffer(vertexData.length * 4).asFloatBuffer();
+		vertexBuffer.put(vertexData).flip();
 
-		vaoId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vaoId);
-
-		vboId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
-
-		this.countAttribs = info.getAttributeCount();
-		info.initAttribPointers();
-
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		GL30.glBindVertexArray(0);
-
+		int countElements;
+		ShortBuffer indexBuffer = null;
 		if(indexData!=null) {
 			countElements = indexData.length;
-			ByteBuffer indexBuffer = BufferUtils.createByteBuffer(countElements * 2);
-			indexBuffer.asShortBuffer().put(indexData).flip();
-	
-			vboiId = GL15.glGenBuffers();
-			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
-			GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
-			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+			indexBuffer = BufferUtils.createByteBuffer(countElements * 2).asShortBuffer();
+			indexBuffer.put(indexData).flip();
 		}
 		else {
 			countElements = vertexData.length * 4 / info.getStride();
 		}
+		
+		create(info, vertexBuffer, indexBuffer, countElements, verticesPerElement, dynamic);
 	}
 	
-	public StaticMesh(VertexInfo info, float[] vertexData, int drawMode, int countElements, boolean dynamic) {
-		vertexBuffer = BufferUtils.createByteBuffer(vertexData.length * 4).asFloatBuffer();
-		vertexBuffer.put(vertexData).flip();
-
-		vaoId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vaoId);
-
-		vboId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, dynamic ? GL15.GL_DYNAMIC_DRAW : GL15.GL_STATIC_DRAW);
-
-		this.countAttribs = info.getAttributeCount();
-		info.initAttribPointers();
-
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		GL30.glBindVertexArray(0);
-		
-		this.drawMode = drawMode;
+	public StaticMesh(VertexInfo info, FloatBuffer vertexBuffer, ShortBuffer indexBuffer, int countElements, int verticesPerElement, boolean dynamic) {
+		create(info, vertexBuffer, indexBuffer, countElements, verticesPerElement, dynamic);
+	}
+	
+	private void create(VertexInfo info, FloatBuffer vertexBuffer, ShortBuffer indexBuffer, int countElements, int verticesPerElement, boolean dynamic) {
 		this.countElements = countElements;
-	}
-	
-	public StaticMesh(VertexInfo info, FloatBuffer vertexBuffer, ShortBuffer indexBuffer, int countIndices) {
-		this.countElements = countIndices;
+		this.drawMode = getDrawMode(verticesPerElement);
+		int usage = dynamic ? GL15.GL_DYNAMIC_DRAW : GL15.GL_STATIC_DRAW;
 		
 		vaoId = GL30.glGenVertexArrays();
 		GL30.glBindVertexArray(vaoId);
 
 		vboId = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, usage);
 
 		this.countAttribs = info.getAttributeCount();
 		info.initAttribPointers();
@@ -93,10 +72,25 @@ public class StaticMesh {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL30.glBindVertexArray(0);
 
-		vboiId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);	
+		if(indexBuffer!=null) {
+			vboiId = GL15.glGenBuffers();
+			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
+			GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, usage);
+			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+	}
+	
+	public static int getDrawMode(int verticesPerElement) {
+		switch(verticesPerElement) {
+			case 1:
+				return GL11.GL_POINTS;
+			case 2:
+				return GL11.GL_LINES;
+			case 3:
+				return GL11.GL_TRIANGLES;
+			default:
+				throw new InvalidParameterException();
+		}
 	}
 	
 	public void bindVAO() {

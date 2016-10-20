@@ -62,6 +62,10 @@ public class PostProcessRenderer implements Renderer {
 //		redrawBackgroundBuffer();
 	}
 	
+	public void setUpdatePerFrame(boolean updatePerFrame) {
+		this.updatePerFrame = updatePerFrame;
+	}
+	
 	protected void redrawBackgroundBuffer(float dt) {
 		if(bgBuffer==null)
 			return;

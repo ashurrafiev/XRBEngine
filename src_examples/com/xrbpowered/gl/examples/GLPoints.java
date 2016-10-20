@@ -126,7 +126,7 @@ public class GLPoints extends ExampleClient {
 				super.unuse();
 			}
 		};
-		simplePoints = new StaticMesh(simpleInfo, pointData, GL11.GL_POINTS, NUM_POINTS, false);
+		simplePoints = new StaticMesh(simpleInfo, pointData, 1, NUM_POINTS, false);
 		
 		Client.checkError();
 		updateInfo();

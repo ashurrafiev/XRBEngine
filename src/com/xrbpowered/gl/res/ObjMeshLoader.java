@@ -66,6 +66,8 @@ public class ObjMeshLoader {
 					builder.add(new StandardMeshBuilder.Triangle(getVertex(s[1]), getVertex(s[2]), getVertex(s[3])) /*.calcTangents()*/ );
 				else if(s.length==5)
 					builder.add(new StandardMeshBuilder.Quad(getVertex(s[1]), getVertex(s[2]), getVertex(s[3]), getVertex(s[4])) /*.calcTangents()*/ );
+				else if(s.length==3)
+					builder.add(new StandardMeshBuilder.Edge(getVertex(s[1]), getVertex(s[2])));
 				else throw new RuntimeException("Unknown face type, can do only tris and quads.");
 			}
 			else if("o".equals(s[0]))

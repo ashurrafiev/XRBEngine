@@ -111,6 +111,7 @@ public class StandardMeshBuilder {
 		public Vertex[] vertices = null;
 		public long smoothGroupMask = 0;
 		public abstract int countTris();
+		public abstract int verticesPerElement();
 		public abstract void putIndices(ShortBuffer buf);
 		public abstract int putIndices(short[] buf, int start);
 		
@@ -127,6 +128,8 @@ public class StandardMeshBuilder {
 		}
 		
 		public Face calcTangents() {
+			// doesn't work?
+			
 			Vector3f edge1 = new Vector3f();
 			Vector3f.sub(vertices[2].position, vertices[0].position, edge1);
 			Vector3f edge2 = new Vector3f();
@@ -154,6 +157,31 @@ public class StandardMeshBuilder {
 		}
 	}
 	
+	public static class Edge extends Face {
+		public Edge(Vertex v0, Vertex v1) {
+			this.vertices = new Vertex[] {v0, v1};
+		}
+		@Override
+		public int countTris() {
+			return 1;
+		}
+		@Override
+		public int verticesPerElement() {
+			return 2;
+		}
+		@Override
+		public void putIndices(ShortBuffer buf) {
+			buf.put(vertices[0].index);
+			buf.put(vertices[1].index);
+		}
+		@Override
+		public int putIndices(short[] buf, int start) {
+			buf[start++] = vertices[0].index;
+			buf[start++] = vertices[1].index;
+			return start;
+		}
+	}
+	
 	public static class Triangle extends Face {
 		public Triangle(Vertex v0, Vertex v1, Vertex v2) {
 			this.vertices = new Vertex[] {v0, v1, v2};
@@ -161,6 +189,10 @@ public class StandardMeshBuilder {
 		@Override
 		public int countTris() {
 			return 1;
+		}
+		@Override
+		public int verticesPerElement() {
+			return 3;
 		}
 		@Override
 		public void putIndices(ShortBuffer buf) {
@@ -184,6 +216,10 @@ public class StandardMeshBuilder {
 		@Override
 		public int countTris() {
 			return 2;
+		}
+		@Override
+		public int verticesPerElement() {
+			return 3;
 		}
 		@Override
 		public void putIndices(ShortBuffer buf) {
@@ -232,9 +268,24 @@ public class StandardMeshBuilder {
 		return count;
 	}
 	
+	public int verticesPerElement() {
+		int res = 0;
+		for(Face f : faces) {
+			int v = f.verticesPerElement();
+			if(v!=res) {
+				if(res>0)
+					return 0;
+				else
+					res = v;
+			}
+		}
+		return res;
+	}
+	
 	public StaticMesh create(boolean calcNormals) {
 		updateIndices();
-		int countIndices = countTris() * 3;
+		int vpe = verticesPerElement();
+		int countIndices = countTris() * vpe;
 		int countVertices = vertices.size();
 		if(countIndices==0 || countVertices==0)
 			return null;
@@ -249,7 +300,7 @@ public class StandardMeshBuilder {
 			v.put(vertexBuffer);
 		vertexBuffer.flip();
 		
-		return new StaticMesh(StandardShader.standardVertexInfo, vertexBuffer, indexBuffer, countIndices);
+		return new StaticMesh(StandardShader.standardVertexInfo, vertexBuffer, indexBuffer, countIndices, vpe, false);
 	}
 	
 	public static StaticMesh cube(float size) {

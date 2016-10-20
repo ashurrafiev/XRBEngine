@@ -166,7 +166,7 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		return menu;
 	}
 	
-	protected Matrix4f projectionMatrix() {
+	public Matrix4f projectionMatrix() {
 		return Projection.perspective(settings.fov, getAspectRatio(), 0.1f, 100.0f);
 	}
 	

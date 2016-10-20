@@ -10,7 +10,6 @@ public class CameraActor extends Actor {
 	
 	public CameraActor(Scene scene) {
 		super(scene);
-		scene.activeCamera = this;
 	}
 	
 	public CameraActor setProjection(Matrix4f projection) {
