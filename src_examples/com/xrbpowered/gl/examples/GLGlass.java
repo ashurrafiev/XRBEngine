@@ -77,6 +77,18 @@ public class GLGlass extends ExampleClient {
 	private GlassShader glassShader;
 	
 	@Override
+	protected String getHelpString() {
+		return formatHelpOnKeys(new String[] {
+				"<b>W</b> / <b>A</b> / <b>S</b> / <b>D</b>|Move around",
+				"<b>SPACE</b> / <b>LSHIFT</b>|Fly up/down",
+				"Hold <b>LMB</b>|Mouse look",
+				"Drag <b>RMB</b>|Move light source",
+				"<b>F1</b>|Toggle FPS limit and VSync",
+				"<b>F2</b>|Toggle wireframe",
+		});
+	}
+	
+	@Override
 	protected void setupResources() {
 		super.setupResources();
 		glassShader = new GlassShader();

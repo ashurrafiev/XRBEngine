@@ -38,7 +38,8 @@ public class PostProcessShader extends Shader {
 		createQuad();
 		
 		use();
-		src.bindColorBuffer(0);
+		if(src!=null)
+			src.bindColorBuffer(0);
 		quad.draw();
 		Texture.unbind(0);
 		unuse();

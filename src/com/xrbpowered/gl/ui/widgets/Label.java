@@ -10,6 +10,7 @@ public class Label extends Widget {
 	public Label(WidgetBox parent, String caption, int style) {
 		super(parent);
 		this.caption = caption;
+		this.style = style;
 	}
 	
 	public String getCaption() {

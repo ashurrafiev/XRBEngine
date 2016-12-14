@@ -19,7 +19,7 @@ public class ObjMeshLoader {
 	private StandardMeshBuilder builder = new StandardMeshBuilder();
 	private HashMap<String, Vertex> indexMap = new HashMap<>();
 	
-	public final float scale;
+	private final float scale;
 
 	private ObjMeshLoader(float scale) {
 		this.scale = scale;

@@ -45,7 +45,7 @@ public class ExampleMenu implements InputHandler {
 	protected final WidgetManager widgets;
 	protected final UIPages pages = new UIPages();
 	
-	protected UIPage pMain, pSettings, pVideoSettings;
+	protected UIPage pMain, pSettings, pVideoSettings, pHelp;
 	protected SystemSettings settings;
 	
 	public ExampleMenu(ExampleClient client) {
@@ -61,6 +61,7 @@ public class ExampleMenu implements InputHandler {
 		WidgetMenuBuilder mb = createMenuBuilder();
 		pVideoSettings = createVideoSettingsPage(mb);
 		pSettings = createSettingsPage(mb);
+		pHelp = createHelpPage(mb);
 		pMain = createMainPage(mb);
 
 		layout();
@@ -133,7 +134,8 @@ public class ExampleMenu implements InputHandler {
 		};
 		optRefreshRate.disableOverriveValue = "Desktop";
 		optRefreshRate.setEnabled(false);
-		mb.addMenuItem(new MenuOptionItem(mb.getPageRoot(), "Window mode", new String[] {"Windowed", "Borderless", "Fullscreen"}, 0, 0) {
+		mb.addMenuItem(new MenuOptionItem(mb.getPageRoot(), "Window mode",
+				displayFreq.isEmpty() || displayRes.isEmpty() ? new String[] {"Windowed", "Borderless"} : new String[] {"Windowed", "Borderless", "Fullscreen"}, 0, 0) {
 			@Override
 			public void onChangeValue(int index) {
 				optResolution.setEnabled(index==2);
@@ -273,6 +275,23 @@ public class ExampleMenu implements InputHandler {
 		mb.addCancelItem("BACK", ExampleWidgetPainters.MENU_STYLE_ACTION);
 		return mb.finishPage();
 	}
+
+	protected String getHelpString() {
+		return null;
+	}
+	
+	protected UIPage createHelpPage(WidgetMenuBuilder mb) {
+		String str = getHelpString();
+		if(str==null)
+			return null;
+		mb.startPage(WIDTH, CAPTION_WIDTH);
+		mb.addWidget(new Label(mb.getPageRoot(), "HELP", ExampleWidgetPainters.LABEL_STYLE_MENU_TITLE));
+		mb.addBlank(20);
+		mb.addWidget(new Label(mb.getPageRoot(), str, ExampleWidgetPainters.LABEL_STYLE_HTML).setSize(mb.getWidth(), 200));
+		mb.addBlank(20);
+		mb.addCancelItem("BACK", ExampleWidgetPainters.MENU_STYLE_ACTION);
+		return mb.finishPage();
+	}
 	
 	protected UIPage createMainPage(WidgetMenuBuilder mb) {
 		mb.startPage(WIDTH, CAPTION_WIDTH);
@@ -282,6 +301,9 @@ public class ExampleMenu implements InputHandler {
 				client.hideMenu();
 			}
 		});
+		MenuItem help = mb.addPageItem("HELP", pHelp, ExampleWidgetPainters.MENU_STYLE_ACTION);
+		if(pHelp==null)
+			help.setEnabled(false);
 		mb.addPageItem("SETTINGS", pSettings, ExampleWidgetPainters.MENU_STYLE_ACTION);
 		mb.addMenuItem(new MenuItem(mb.getPageRoot(), "EXIT", ExampleWidgetPainters.MENU_STYLE_ACTION) {
 			@Override
@@ -299,6 +321,8 @@ public class ExampleMenu implements InputHandler {
 		pMain.layout(screenWidth, screenHeight);
 		pVideoSettings.layout(screenWidth, screenHeight);
 		pSettings.layout(screenWidth, screenHeight);
+		if(pHelp!=null)
+			pHelp.layout(screenWidth, screenHeight);
 	}
 	
 	protected PostProcessRenderer createBackground(Renderer parent) {

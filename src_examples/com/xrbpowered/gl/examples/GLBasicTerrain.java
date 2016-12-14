@@ -20,7 +20,7 @@ public class GLBasicTerrain extends ExampleClient {
 		System.out.printf("Mesh generated in %d ms\n", (System.currentTimeMillis() - t));
 		
 		// TODO decals
-	}
+	}		@Override	protected String getHelpString() {		return formatHelpOnKeys(new String[] {				"<b>W</b> / <b>A</b> / <b>S</b> / <b>D</b>|Move around",				"<b>SPACE</b> / <b>LSHIFT</b>|Fly up/down",				"Hold <b>LMB</b>|Mouse look",				"Drag <b>RMB</b>|Move light source",				"<b>F1</b>|Toggle FPS limit and VSync",				"<b>F2</b>|Toggle wireframe",				"<b>F3</b>|Toggle terrain rotation",				"<b>F4</b>|Generate new terrain",		});	}
 	
 	@Override
 	protected void setupResources() {		super.setupResources();

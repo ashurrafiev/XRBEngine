@@ -2,7 +2,6 @@ package com.xrbpowered.gl.examples;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
@@ -13,6 +12,7 @@ import com.xrbpowered.gl.ui.widgets.WidgetBox;
 import com.xrbpowered.gl.ui.widgets.WidgetPainter;
 import com.xrbpowered.gl.ui.widgets.menu.MenuItem;
 import com.xrbpowered.gl.ui.widgets.menu.MenuOptionItem;
+import com.xrbpowered.utils.TextUtils;
 
 public abstract class ExampleWidgetPainters {
 
@@ -29,7 +29,8 @@ public abstract class ExampleWidgetPainters {
 	public static final int MENU_STYLE_OPTION = 0;
 	public static final int MENU_STYLE_ACTION = 1;
 	
-	public static final int LABEL_STYLE_MENU_TITLE = 0;
+	public static final int LABEL_STYLE_MENU_TITLE = 1;
+	public static final int LABEL_STYLE_HTML = 2;
 	
 	private static final WidgetPainter<WidgetBox> rootPainter = new WidgetPainter<WidgetBox>() {
 		@Override
@@ -65,18 +66,6 @@ public abstract class ExampleWidgetPainters {
 			return 0;
 		}
 	};
-	
-	public static int drawStringCentered(Graphics2D g2, String str, int x, int y) {
-		FontMetrics fm = g2.getFontMetrics();
-		g2.drawString(str, x - fm.stringWidth(str)/2, y + fm.getAscent()/2 - fm.getDescent()/2);
-		return y + fm.getHeight();
-	}
-
-	public static int drawStringVCentered(Graphics2D g2, String str, int x, int y) {
-		FontMetrics fm = g2.getFontMetrics();
-		g2.drawString(str, x, y + fm.getAscent()/2 - fm.getDescent()/2);
-		return y + fm.getHeight();
-	}
 
 	public static void init() {
 		Button.painter = new WidgetPainter<Button>() {
@@ -86,7 +75,7 @@ public abstract class ExampleWidgetPainters {
 				g2.fillRoundRect(0, 0, w.getWidth()-1, w.getHeight()-1, 10, 10);
 				g2.setColor(w.isEnabled() ? UI_BUTTON_TEXT_COLOR : UI_BUTTON_DISABLED_TEXT_COLOR);
 				g2.setFont(ExampleClient.LARGE_FONT);
-				drawStringCentered(g2, w.getCaption(), w.getWidth()/2, w.getHeight()/2);
+				TextUtils.drawString(g2, w.getCaption(), w.getWidth()/2, w.getHeight()/2, TextUtils.CENTER, TextUtils.CENTER);
 			}
 			@Override
 			public int getDefaultWidth(Button w) {
@@ -101,19 +90,23 @@ public abstract class ExampleWidgetPainters {
 		Label.painter = new WidgetPainter<Label>() {
 			@Override
 			public void paint(Graphics2D g2, Label w) {
-				int dx = 0;
-				switch(w.getStyle()) {
+				int pad = 0;
+				int style = w.getStyle(); 
+				switch(style) {
 					case LABEL_STYLE_MENU_TITLE:
 						g2.setColor(UI_LABEL_TITLE_COLOR);
 						g2.setFont(ExampleClient.LARGE_FONT);
-						dx = 10;
+						pad = 10;
 						break;
 					default:
 						g2.setColor(UI_LABEL_HINT_COLOR);
 						g2.setFont(ExampleClient.SMALL_FONT);
 						break;
 				}
-				drawStringVCentered(g2, w.getCaption(), dx, w.getHeight()/2);
+				if(style==LABEL_STYLE_HTML)
+					TextUtils.drawFormattedString(g2, w.getCaption(), pad, pad, w.getWidth()-pad*2, w.getHeight()-pad*2);
+				else
+					TextUtils.drawString(g2, w.getCaption(), pad, w.getHeight()/2, TextUtils.LEFT, TextUtils.CENTER);
 			}
 			@Override
 			public int getDefaultWidth(Label w) {
@@ -145,11 +138,11 @@ public abstract class ExampleWidgetPainters {
 				g2.setColor(w.isEnabled() ? UI_BUTTON_TEXT_COLOR : UI_BUTTON_DISABLED_TEXT_COLOR);
 				if(w.style==MENU_STYLE_ACTION) {
 					g2.setFont(ExampleClient.LARGE_FONT);
-					drawStringCentered(g2, w.caption, w.getWidth()/2, w.getHeight()/2);
+					TextUtils.drawString(g2, w.caption, w.getWidth()/2, w.getHeight()/2, TextUtils.CENTER, TextUtils.CENTER);
 				}
 				else {
 					g2.setFont(ExampleClient.SMALL_FONT);
-					drawStringVCentered(g2, w.caption, 10, w.getHeight()/2);
+					TextUtils.drawString(g2, w.caption, 10, w.getHeight()/2, TextUtils.LEFT, TextUtils.CENTER);
 				}
 			}
 			@Override
@@ -191,8 +184,8 @@ public abstract class ExampleWidgetPainters {
 					g2.fillRect(w.captionWidth, 0, w.getWidth()-w.captionWidth, w.getHeight());
 				}
 				g2.setColor(w.isEnabled() ? UI_BUTTON_TEXT_COLOR : UI_BUTTON_DISABLED_TEXT_COLOR);
-				drawStringVCentered(g2, w.caption, 10, w.getHeight()/2);
-				drawStringCentered(g2, w.getValueName(), w.valueBox.getX()+w.valueBox.getWidth()/2, w.getHeight()/2);
+				TextUtils.drawString(g2, w.caption, 10, w.getHeight()/2, TextUtils.LEFT, TextUtils.CENTER);
+				TextUtils.drawString(g2, w.getValueName(), w.valueBox.getX()+w.valueBox.getWidth()/2, w.getHeight()/2, TextUtils.CENTER, TextUtils.CENTER);
 			}
 			@Override
 			public int getDefaultWidth(MenuOptionItem w) {

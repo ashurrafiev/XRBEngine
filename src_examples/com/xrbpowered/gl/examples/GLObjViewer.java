@@ -34,6 +34,19 @@ public class GLObjViewer extends ExampleClient {
 	}
 
 	@Override
+	protected String getHelpString() {
+		return formatHelpOnKeys(new String[] {
+				"<b>W</b> / <b>A</b> / <b>S</b> / <b>D</b>|Move object",
+				"<b>SPACE</b> / <b>LSHIFT</b>|Move up/down",
+				"Drag <b>LMB</b>|Rotate object",
+				"Drag <b>RMB</b>|Move light source",
+				"<b>F1</b>|Toggle FPS limit and VSync",
+				"<b>F2</b>|Toggle wireframe",
+				"<b>F3</b>|Toggle light rotation",
+		});
+	}
+	
+	@Override
 	protected void setupResources() {
 		super.setupResources();
 		texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422));

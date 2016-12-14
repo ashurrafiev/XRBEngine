@@ -40,10 +40,13 @@ public class OffscreenBuffers extends RenderTarget {
 		return texId;
 	}
 	
+	public int getColorTexId() {
+		return colorTexId;
+	}
+	
 	public void bindColorBuffer(int index) {
 		GL13.glActiveTexture(GL13.GL_TEXTURE0 + index);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexId);
-		GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 	}
 	
 	@Override

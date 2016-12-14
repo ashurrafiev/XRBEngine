@@ -34,6 +34,10 @@ public class WidgetMenuBuilder {
 		addPadding = false;
 		root = createRoot();
 	}
+	
+	public int getWidth() {
+		return width;
+	}
 
 	protected WidgetBox createRoot() {
 		return new WidgetBox(null);

@@ -42,7 +42,7 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 
 	public static Color CLEAR_COLOR = new Color(0.4f, 0.6f, 0.9f);
 	
-	public static Font SMALL_FONT = new Font("Verdana", Font.PLAIN, 11);
+	public static Font SMALL_FONT = new Font("Verdana", Font.PLAIN, 12);
 	public static Font LARGE_FONT = SMALL_FONT.deriveFont(Font.BOLD, 17f);
 	public static int UI_PANE_X = 20;
 	public static int UI_PANE_Y = 20;
@@ -90,7 +90,9 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 	public ExampleClient(int width, int height) {
 		settings.windowedWidth = width;
 		settings.windowedHeight = height;
-		AssetManager.defaultAssets = new FileAssetManager("example_assets", new CPAssetManager("assets", AssetManager.defaultAssets));
+		AssetManager.defaultAssets = new FileAssetManager("example_assets", new CPAssetManager(
+				"com/xrbpowered/gl/examples/shaders",
+				new CPAssetManager("assets", AssetManager.defaultAssets)));
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		
 		Client.checkError();
 		UIShader.getInstance();
-		StandardShader.getInstance();
+//		StandardShader.getInstance();
 		
 		uiDebugPane = new UIPane(ui, new BufferTexture(UI_PANE_WIDTH, UI_PANE_HEIGHT, false, false, true) {
 			@Override
@@ -139,6 +141,25 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		createMenu();
 	}
 	
+	protected String getHelpString() {
+		return null;
+	}
+	
+	protected static String formatHelpOnKeys(String[] actions) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<html><table width=\"100%\">");
+		for(String a : actions) {
+			String[] s = a.split("\\|", 2);
+			sb.append("<tr><td align=\"right\" valign=\"top\"><font color=\"#ffffff\">");
+			sb.append(s[0].replaceAll("\\s", "&nbsp;"));
+			sb.append("</font></td><td valign=\"top\">");
+			sb.append(s[1]);
+			sb.append("</td></tr>");
+		}
+		sb.append("</table></html>");
+		return sb.toString();
+	}
+	
 	protected ExampleMenu createMenu() {
 		menu = new ExampleMenu(this) { // FIXME simple background
 			@Override
@@ -150,19 +171,11 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 				super.start();
 				((BlurBackground) getBackground()).startTween(1f, 0.5f);
 			}
-		};
-		new UIPane(menu.ui, new BufferTexture(200, 60, false, false, false) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
-				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				g2.setFont(ExampleClient.SMALL_FONT);
-				g2.setColor(Color.WHITE);
-				g2.drawString("Press SPACE to resume", 0, 20);
-				g2.drawString("Press ESC to quit", 0, 35);
-				return false;
+			protected String getHelpString() {
+				return ExampleClient.this.getHelpString();
 			}
-		}).setAnchor(50, 50);
-
+		};
 		return menu;
 	}
 	
@@ -191,7 +204,7 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		if(uiDebugInfo!=null) {
 			g2.setFont(SMALL_FONT);
 			g2.setColor(UI_PANE_INFO_COLOR);
-			g2.drawString(uiDebugTitle, 9, 37);
+			g2.drawString(uiDebugInfo, 9, 37);
 		}
 		if(fpsUpdateTime>0f) {
 			g2.setFont(SMALL_FONT);

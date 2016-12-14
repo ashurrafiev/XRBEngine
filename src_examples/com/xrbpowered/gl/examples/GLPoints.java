@@ -43,6 +43,17 @@ public class GLPoints extends ExampleClient {
 	}
 	
 	@Override
+	protected String getHelpString() {
+		return formatHelpOnKeys(new String[] {
+				"<b>W</b> / <b>A</b> / <b>S</b> / <b>D</b>|Fly around",
+				"<b>SPACE</b> / <b>LSHIFT</b>|Fly up/down",
+				"Hold <b>LMB</b>|Mouse look",
+				"<b>F1</b>|Toggle FPS limit and VSync",
+				"<b>F2</b>|Change depth-sorting mode",
+		});
+	}
+	
+	@Override
 	protected void setupResources() {
 		super.setupResources();
 

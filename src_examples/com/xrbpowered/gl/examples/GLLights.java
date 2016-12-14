@@ -62,6 +62,19 @@ public class GLLights extends ExampleClient {
 	protected int activeObject = 0;
 	
 	@Override
+	protected String getHelpString() {
+		return formatHelpOnKeys(new String[] {
+				"<b>W</b> / <b>A</b> / <b>S</b> / <b>D</b>|Move around",
+				"Hold <b>LMB</b>|Mouse look",
+				"<b>E</b>|Select a light under the cursor",
+				"Hold <b>RMB</b>|Use camera controls to move the<br>selected light source",
+				"<b>F1</b>|Toggle FPS limit and VSync",
+				"<b>F2</b>|Toggle wireframe",
+				"<b>F4</b>|Toggle post-processing effect",
+		});
+	}
+	
+	@Override
 	protected void setupResources() {
 		super.setupResources();
 		postProc = new PostProcessShader("post_toxic_f.glsl");
