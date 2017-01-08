@@ -27,25 +27,29 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import com.xrbpowered.gl.res.StandardMeshBuilder;
-import com.xrbpowered.gl.res.StandardMeshBuilder.Vertex;
 import com.xrbpowered.gl.res.StaticMesh;
+import com.xrbpowered.gl.res.builder.AdvancedMeshBuilder;
+import com.xrbpowered.gl.res.builder.MeshBuilder;
+import com.xrbpowered.gl.res.builder.AdvancedMeshBuilder.Vertex;
+import com.xrbpowered.gl.res.shaders.VertexInfo;
 import com.xrbpowered.utils.assets.AssetManager;
 
 public class FbxMeshLoader {
-
-	private StandardMeshBuilder builder = new StandardMeshBuilder();
+	private static final float NORM_EPSILON = 0.01f;
 	
+	private AdvancedMeshBuilder builder;
 	private final float scale;
 
-	private FbxMeshLoader(float scale) {
+	private FbxMeshLoader(AdvancedMeshBuilder builder, float scale) {
+		this.builder = builder;
 		this.scale = scale;
 	}
 	
 	private void setVertices(FbxTable table) {
 		float[] v = table.get("Vertices").getAll((float[]) null);
 		for(int i=0; i<v.length; i+=3) {
-			builder.add(new Vertex(v[i+0]*scale, v[i+2]*scale, -v[i+1]*scale));
+			builder.addVertex().setPosition(v[i+0]*scale, v[i+2]*scale, -v[i+1]*scale);
+//			builder.add(new Vertex(v[i+0]*scale, v[i+2]*scale, -v[i+1]*scale));
 		}
 	}
 	
@@ -59,9 +63,9 @@ public class FbxMeshLoader {
 				index = (-index)-1;
 				poly[pi++] = builder.vertices.get(index);
 				if(pi==3)
-					builder.add(new StandardMeshBuilder.Triangle(poly[0], poly[1], poly[2]));
+					builder.add(new AdvancedMeshBuilder.Triangle(poly[0], poly[1], poly[2]));
 				else if(pi==4)
-					builder.add(new StandardMeshBuilder.Quad(poly[0], poly[1], poly[2], poly[3]));
+					builder.add(new AdvancedMeshBuilder.Quad(poly[0], poly[1], poly[2], poly[3]));
 				else throw new RuntimeException("Unknown face type, can do only tris and quads.");
 				pi = 0;
 			}
@@ -78,10 +82,12 @@ public class FbxMeshLoader {
 			float[] vn = normals.get("Normals").getAll((float[]) null);
 			for(int i=0; i<vn.length/3; i++) {
 				Vertex v = builder.vertices.get(i);
-				v.setNormal(vn[i*3+0], vn[i*3+2], -vn[i*3+1]);
-				//if(v.normal.x==1f || v.normal.x==-1f)
-				if(Math.abs(Math.abs(v.normal.x)-1f)<0.01f)
+				Vector3f norm = new Vector3f(vn[i*3+0], vn[i*3+2], -vn[i*3+1]);
+				v.setNormal(norm);
+				if(Math.abs(Math.abs(norm.x)-1f)<NORM_EPSILON)
 					v.setTangent(new Vector3f(0, 1, 0));
+				else
+					v.setTangent(new Vector3f(1, 0, 0));
 			}
 		}
 		else throw new RuntimeException(String.format("Specified MappingInformationType/ReferenceInformationType not impelemted yet: %s / %s",
@@ -112,10 +118,10 @@ public class FbxMeshLoader {
 		int[] indices = setIndices(table);
 		setNormals(table);
 		setUvs(table, indices);
-		return builder.create(false);
+		return builder.create();
 	}
 
-	public static StaticMesh loadFbx(String path, String meshName, float scale) {
+	public static StaticMesh loadFbx(String path, String meshName, float scale, VertexInfo info, MeshBuilder.Options options) {
 		try {
 			FbxTable fbx = new FbxParser().parse(AssetManager.defaultAssets.loadString(path));
 			FbxArray objects = fbx.get("Objects");
@@ -126,7 +132,7 @@ public class FbxMeshLoader {
 				throw new RuntimeException("No models");
 			for(FbxArray mdl : models) {
 				if((meshName==null || mdl.get(0).toString().equals(meshName)) && mdl.get(1).toString().equals("Mesh")) {
-					return new FbxMeshLoader(scale).load(mdl.getTable());
+					return new FbxMeshLoader(new AdvancedMeshBuilder(info, options), scale).load(mdl.getTable());
 				}
 			}
 			throw new RuntimeException("Mesh not found");

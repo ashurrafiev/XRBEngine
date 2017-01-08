@@ -31,8 +31,8 @@ import com.xrbpowered.gl.res.shaders.VertexInfo;
 public class UIManager {
 
 	public static VertexInfo uiVertexInfo = new VertexInfo()
-			.addFloatAttrib("in_Position", 2)
-			.addFloatAttrib("in_TexCoord", 2);
+			.addAttrib("in_Position", 2)
+			.addAttrib("in_TexCoord", 2);
 	
 	List<UIPane> panes = new ArrayList<>();
 	

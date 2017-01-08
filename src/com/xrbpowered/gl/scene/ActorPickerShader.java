@@ -31,7 +31,7 @@ import com.xrbpowered.gl.res.shaders.VertexInfo;
 public class ActorPickerShader extends ActorShader {
 	
 	private ActorPickerShader() {
-		super(new VertexInfo().addFloatAttrib("in_Position", 3), "pick_v.glsl", "pick_f.glsl");
+		super(new VertexInfo().addAttrib("in_Position", 3), "pick_v.glsl", "pick_f.glsl");
 	}
 	
 	private int objIdLocation;

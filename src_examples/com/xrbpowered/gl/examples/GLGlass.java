@@ -33,10 +33,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.xrbpowered.gl.res.StandardMeshBuilder;
 import com.xrbpowered.gl.res.StaticMesh;
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
+import com.xrbpowered.gl.res.builder.FastMeshBuilder;
 import com.xrbpowered.gl.res.shaders.PostProcessShader;
 import com.xrbpowered.gl.res.shaders.StandardShader;
 import com.xrbpowered.gl.res.textures.BufferTexture;
@@ -55,7 +55,6 @@ public class GLGlass extends ExampleClient {
 	protected Texture normal;
 	protected Texture blurMask;
 
-	protected StaticMesh object;
 	protected StaticMeshActor[] objectActors;
 	protected StaticMesh plane;
 	protected StaticMeshActor[] planeActors1;
@@ -121,13 +120,12 @@ public class GLGlass extends ExampleClient {
 		alpha2 = BufferTexture.createPlainColor(4, 4, new Color(0x00ffffff, true));
 		normal = new Texture("glass_n.png");
 		blurMask = new Texture("glass_blur.png");
-		object = StandardMeshBuilder.sphere(1, 16);
-		plane = StandardMeshBuilder.plane(4f, 1, 1);
+		plane = FastMeshBuilder.plane(4f, 1, 1, StandardShader.standardVertexInfo, null);
 		
 		Random random = new Random();
 		objectActors = new StaticMeshActor[NUM_OBJECTS];
 		for(int i=0; i<NUM_OBJECTS; i++) {
-			objectActors[i] = StandardMeshBuilder.makeActor(scene, plane, diffuse, noSpecularTexture, plainNormalTexture);
+			objectActors[i] = StaticMeshActor.make(scene, plane, StandardShader.getInstance(), diffuse, noSpecularTexture, plainNormalTexture);
 			objectActors[i].position.x = random.nextFloat()*OBJECT_RANGE*2f - OBJECT_RANGE;
 			objectActors[i].position.y = random.nextFloat()*OBJECT_RANGE*2f - OBJECT_RANGE;
 			objectActors[i].position.z = random.nextFloat()*OBJECT_RANGE*2f - OBJECT_RANGE;
@@ -137,9 +135,9 @@ public class GLGlass extends ExampleClient {
 		planeActors1 = new StaticMeshActor[NUM_PLANES];
 		planeActors2 = new StaticMeshActor[NUM_PLANES];
 		for(int i=0; i<NUM_PLANES; i++) {
-			planeActors1[i] = StandardMeshBuilder.makeActor(scene, plane, alpha1, plainSpecularTexture, normal);
+			planeActors1[i] = StaticMeshActor.make(scene, plane, StandardShader.getInstance(), alpha1, plainSpecularTexture, normal);
 			planeActors1[i].setShader(glassShader);
-			planeActors2[i] = StandardMeshBuilder.makeActor(scene, plane, alpha2, noSpecularTexture, normal);
+			planeActors2[i] = StaticMeshActor.make(scene, plane, StandardShader.getInstance(), alpha2, noSpecularTexture, normal);
 			planeActors2[i].setShader(glassShader);
 			planeActors1[i].position.x = random.nextFloat()*OBJECT_RANGE*2f - OBJECT_RANGE;
 			planeActors1[i].position.y = random.nextFloat()*OBJECT_RANGE*2f - OBJECT_RANGE;
@@ -217,7 +215,6 @@ public class GLGlass extends ExampleClient {
 		interBuffers.destroy();
 		blurBuffers.destroy();
 		postProc.destroy();
-		object.destroy();
 		plane.destroy();
 		diffuse.destroy();
 		alpha1.destroy();

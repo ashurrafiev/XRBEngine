@@ -34,10 +34,10 @@ import com.xrbpowered.gl.scene.ShaderEnvironment;
 public class StandardShader extends ActorShader {
 	
 	public static final VertexInfo standardVertexInfo = new VertexInfo()
-			.addFloatAttrib("in_Position", 3)
-			.addFloatAttrib("in_Normal", 3)
-			.addFloatAttrib("in_Tangent", 3)
-			.addFloatAttrib("in_TexCoord", 2);
+			.addAttrib("in_Position", 3)
+			.addAttrib("in_Normal", 3)
+			.addAttrib("in_Tangent", 3)
+			.addAttrib("in_TexCoord", 2);
 	
 	public static class StandardShaderEnvironment  extends ShaderEnvironment<StandardShader> {
 		public Vector3f lightDir = new Vector3f(0, 0, 1);

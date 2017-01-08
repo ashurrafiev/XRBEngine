@@ -33,10 +33,10 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import com.xrbpowered.gl.res.StandardMeshBuilder;
 import com.xrbpowered.gl.res.StaticMesh;
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
+import com.xrbpowered.gl.res.builder.FastMeshBuilder;
 import com.xrbpowered.gl.res.shaders.ActorShader;
 import com.xrbpowered.gl.res.shaders.PostProcessShader;
 import com.xrbpowered.gl.res.shaders.StandardShader;
@@ -107,8 +107,8 @@ public class GLLights extends ExampleClient {
 		normal = new Texture("normal.jpg");
 		globeShader = new GlobeShader();
 		
-		plane = StandardMeshBuilder.plane(PLANE_SIZE, 1, 4);
-		planeActor = StandardMeshBuilder.makeActor(scene, plane, diffuse, specular, normal);
+		plane = FastMeshBuilder.plane(PLANE_SIZE, 1, 4, StandardShader.standardVertexInfo, null);
+		planeActor = StaticMeshActor.make(scene, plane, StandardShader.getInstance(), diffuse, specular, normal);
 		planeActor.position.y = PLANE_Y;
 		planeActor.updateTransform();
 		
@@ -117,8 +117,8 @@ public class GLLights extends ExampleClient {
 		objectActors = new StaticMeshActor[NUM_OBJECTS];
 		for(int i=0; i<NUM_OBJECTS; i++) {
 			float r = random.nextFloat()+0.5f;
-			objects[i] = StandardMeshBuilder.sphere(r, 16);
-			objectActors[i] = StandardMeshBuilder.makeActor(scene, objects[i], diffuse, specular, normal);
+			objects[i] = FastMeshBuilder.sphere(r, 16, StandardShader.standardVertexInfo, null);
+			objectActors[i] = StaticMeshActor.make(scene, objects[i], StandardShader.getInstance(), diffuse, specular, normal);
 			float d = PLANE_SIZE/2f - r;
 			objectActors[i].position.x = random.nextFloat()*d*2f - d;
 			objectActors[i].position.y = PLANE_Y + r;
@@ -129,8 +129,8 @@ public class GLLights extends ExampleClient {
 		lightActors = new StaticMeshActor[NUM_LIGHTS];
 		lightColors = new Vector4f[NUM_LIGHTS];
 		for(int i=0; i<NUM_LIGHTS; i++) {
-			lightGlobes[i] = StandardMeshBuilder.sphere(0.1f, 8);
-			lightActors[i] = StandardMeshBuilder.makeActor(scene, lightGlobes[i], specular, specular, plainNormalTexture);
+			lightGlobes[i] = FastMeshBuilder.sphere(0.1f, 8, StandardShader.standardVertexInfo, null);
+			lightActors[i] = StaticMeshActor.make(scene, lightGlobes[i], StandardShader.getInstance(), specular, specular, plainNormalTexture);
 			lightActors[i].setShader(globeShader);
 			lightActors[i].position.x = random.nextFloat()*PLANE_SIZE - PLANE_SIZE/2f;
 			lightActors[i].position.y = -1f + random.nextFloat() * 2f;

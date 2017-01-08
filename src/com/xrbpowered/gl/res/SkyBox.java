@@ -41,7 +41,7 @@ public class SkyBox {
 	public SkyBox(final Scene scene, String texturePathFormat) {
 		texture = new CubeTexture(texturePathFormat);
 		
-		VertexInfo info = new VertexInfo().addFloatAttrib("in_Position", 3);
+		VertexInfo info = new VertexInfo().addAttrib("in_Position", 3);
 
 		shader = new Shader(info, "sky_v.glsl", "sky_f.glsl") {
 			private int projectionMatrixLocation;

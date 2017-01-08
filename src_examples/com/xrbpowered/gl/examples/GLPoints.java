@@ -82,9 +82,9 @@ public class GLPoints extends ExampleClient {
 
 		FeedbackVertexInfo tInfo = (FeedbackVertexInfo) new FeedbackVertexInfo()
 				.setFeedbackNames(new String[] {"out_Position", "out_Size"})
-				.addFloatAttrib("in_Position", 3).addFloatAttrib("in_Size", 1);
-		VertexInfo rInfo = new VertexInfo().addFloatAttrib("in_Position", 4).addFloatAttrib("in_Size", 1);
-		VertexInfo simpleInfo = new VertexInfo().addFloatAttrib("in_Position", 3).addFloatAttrib("in_Size", 1);
+				.addAttrib("in_Position", 3).addAttrib("in_Size", 1);
+		VertexInfo rInfo = new VertexInfo().addAttrib("in_Position", 4).addAttrib("in_Size", 1);
+		VertexInfo simpleInfo = new VertexInfo().addAttrib("in_Position", 3).addAttrib("in_Size", 1);
 		
 		pointData = new float [NUM_POINTS*4];
 		indexData = new Integer[NUM_POINTS];

@@ -27,7 +27,7 @@ import com.xrbpowered.gl.res.StaticMesh;
 import com.xrbpowered.gl.res.shaders.ActorShader;
 import com.xrbpowered.gl.res.textures.Texture;
 
-public abstract class StaticMeshActor extends Actor {
+public class StaticMeshActor extends Actor {
 
 	private StaticMesh mesh = null;
 	private ActorShader shader = null;
@@ -35,10 +35,7 @@ public abstract class StaticMeshActor extends Actor {
 	
 	public StaticMeshActor(Scene scene) {
 		super(scene);
-		setup();
 	}
-	
-	protected abstract void setup();
 	
 	public void setMesh(StaticMesh mesh) {
 		this.mesh = mesh;
@@ -71,5 +68,13 @@ public abstract class StaticMeshActor extends Actor {
 		}
 		mesh.draw();
 		shader.unuse();
+	}
+	
+	public static StaticMeshActor make(Scene scene, final StaticMesh mesh, final ActorShader shader, final Texture diffuse, final Texture specular, final Texture normal) {
+		StaticMeshActor actor =  new StaticMeshActor(scene);
+		actor.setMesh(mesh);
+		actor.setShader(shader);
+		actor.setTextures(new Texture[] {diffuse, specular, normal});
+		return actor;
 	}
 }

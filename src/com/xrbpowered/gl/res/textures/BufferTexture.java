@@ -36,7 +36,7 @@ import org.lwjgl.opengl.GL13;
 
 public abstract class BufferTexture extends Texture {
 
-	private BufferedImage imgBuffer = null;
+	protected BufferedImage imgBuffer = null;
 	private IntBuffer intBuffer = null;
 	private int[] pixels = null;
 	private boolean staticBuffers = false;

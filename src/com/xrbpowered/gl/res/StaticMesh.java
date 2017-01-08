@@ -67,7 +67,7 @@ public class StaticMesh {
 			indexBuffer.put(indexData).flip();
 		}
 		else {
-			countElements = vertexData.length * 4 / info.getStride();
+			countElements = vertexData.length / info.getSkip();
 		}
 		
 		create(info, vertexBuffer, indexBuffer, countElements, verticesPerElement, dynamic);

@@ -1,5 +1,5 @@
 /******************************************************************************* * MIT License * * Copyright (c) 2016 Ashur Rafiev * * Permission is hereby granted, free of charge, to any person obtaining a copy * of this software and associated documentation files (the "Software"), to deal * in the Software without restriction, including without limitation the rights * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell * copies of the Software, and to permit persons to whom the Software is * furnished to do so, subject to the following conditions: * * The above copyright notice and this permission notice shall be included in all * copies or substantial portions of the Software. * * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE * SOFTWARE. *******************************************************************************/package com.xrbpowered.gl.examples;
-import java.awt.Color;import java.awt.Graphics2D;import org.lwjgl.input.Keyboard;import org.lwjgl.input.Mouse;import org.lwjgl.opengl.EXTTextureFilterAnisotropic;import org.lwjgl.opengl.GL11;import com.xrbpowered.gl.Client;import com.xrbpowered.gl.res.StandardMeshBuilder;import com.xrbpowered.gl.res.StaticMesh;import com.xrbpowered.gl.res.buffers.RenderTarget;import com.xrbpowered.gl.res.shaders.StandardShader;import com.xrbpowered.gl.res.textures.Texture;import com.xrbpowered.gl.scene.ActorPicker;import com.xrbpowered.gl.scene.StaticMeshActor;
+import java.awt.Color;import java.awt.Graphics2D;import org.lwjgl.input.Keyboard;import org.lwjgl.input.Mouse;import org.lwjgl.opengl.EXTTextureFilterAnisotropic;import org.lwjgl.opengl.GL11;import com.xrbpowered.gl.Client;import com.xrbpowered.gl.res.StaticMesh;import com.xrbpowered.gl.res.buffers.RenderTarget;import com.xrbpowered.gl.res.builder.FastMeshBuilder;import com.xrbpowered.gl.res.shaders.StandardShader;import com.xrbpowered.gl.res.textures.Texture;import com.xrbpowered.gl.scene.ActorPicker;import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class GLBasicTerrain extends ExampleClient {
 
@@ -16,7 +16,7 @@ public class GLBasicTerrain extends ExampleClient {
 		HeightMap map = new HeightMap(64);
 		map.generatePerlin(5, 0f, 0.4f, 2.5f, true);
 		// TODO multi-texture terrain
-		terrain = StandardMeshBuilder.terrain(32f, map.hmap, 8);
+		terrain = FastMeshBuilder.terrain(32f, map.hmap, 8, StandardShader.standardVertexInfo, null);
 		System.out.printf("Mesh generated in %d ms\n", (System.currentTimeMillis() - t));
 		
 		// TODO decals
@@ -26,12 +26,11 @@ public class GLBasicTerrain extends ExampleClient {
 	protected void setupResources() {		super.setupResources();
 		specular = new Texture("ice2a.jpg");		
 		diffuse = new Texture("ice1a2.jpg");		float anis = GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT);		System.out.printf("Max anisotropy: %.1f\n", anis);		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, anis);				normal = new Texture("ice_n.jpg");				createTerrainMesh();
-		obj = StandardMeshBuilder.sphere(2f, 16);
-		pickObjects = new StaticMesh[] {null, terrain, obj};
-				terrainActor = StandardMeshBuilder.makeActor(scene, terrain, diffuse, specular, plainNormalTexture);
+		obj = FastMeshBuilder.sphere(2f, 128, StandardShader.standardVertexInfo, null);		pickObjects = new StaticMesh[] {null, terrain, obj};
+				terrainActor = StaticMeshActor.make(scene, terrain, StandardShader.getInstance(), diffuse, specular, plainNormalTexture);
 		terrainActor.updateTransform();
 		
-		objActor = StandardMeshBuilder.makeActor(scene, obj, diffuse, specular, normal);
+		objActor = StaticMeshActor.make(scene, obj, StandardShader.getInstance(), diffuse, specular, normal);
 		objActor.position.setY(2f);
 		objActor.updateTransform();				StandardShader.environment.ambientColor.set(0.0f, 0.1f, 0.25f);		StandardShader.environment.lightColor.set(0.9f, 0.85f, 0.8f);
 	}		@Override	protected boolean updateDebugInfoBuffer(Graphics2D g2, int w, int h) {		uiDebugTitle = objectNames[pickObject];		uiDebugInfo = pickObjects==null || pickObjects[pickObject]==null ? "" : String.format("Triangles: %d", pickObjects[pickObject].countTris());		super.updateDebugInfoBuffer(g2, w, h);				g2.setColor(Color.BLACK);		String fps = String.format("Color: %08x", pickColor);		g2.drawString(fps, 120, 56);		g2.setColor(Color.WHITE);		g2.drawString(fps, 119, 55);		g2.setColor(new Color(pickColor));		g2.fillRect(220, 44, 15, 15);		return true;	}

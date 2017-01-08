@@ -27,10 +27,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.xrbpowered.gl.res.ObjMeshLoader;
-import com.xrbpowered.gl.res.StandardMeshBuilder;
 import com.xrbpowered.gl.res.StaticMesh;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
+import com.xrbpowered.gl.res.builder.ObjMeshLoader;
 import com.xrbpowered.gl.res.fbx.FbxMeshLoader;
 import com.xrbpowered.gl.res.shaders.StandardShader;
 import com.xrbpowered.gl.res.textures.Texture;
@@ -72,10 +71,10 @@ public class GLFbxViewer extends ExampleClient {
 //		mesh = StandardMeshBuilder.sphere(0.5f, 32);
 //		mesh = StandardMeshBuilder.cube(1f);
 //		mesh = ObjMeshLoader.loadObj(INPUT_OBJ_FILE, 0, 1f);
-		fbxMesh = FbxMeshLoader.loadFbx(INPUT_FBX_FILE, MODEL_NAME, 1f);
-		objMesh = ObjMeshLoader.loadObj(INPUT_OBJ_FILE, 0, 1f);
+		fbxMesh = FbxMeshLoader.loadFbx(INPUT_FBX_FILE, MODEL_NAME, 1f, StandardShader.standardVertexInfo, null);
+		objMesh = ObjMeshLoader.loadObj(INPUT_OBJ_FILE, 0, 1f, StandardShader.standardVertexInfo, null);
 		
-		meshActor = StandardMeshBuilder.makeActor(scene, fbxMesh, texture, plainSpecularTexture, normal);
+		meshActor = StaticMeshActor.make(scene, fbxMesh, StandardShader.getInstance(), texture, plainSpecularTexture, normal);
 		meshActor.position = new Vector3f(0, 0, -2);
 		meshActor.updateTransform();
 		

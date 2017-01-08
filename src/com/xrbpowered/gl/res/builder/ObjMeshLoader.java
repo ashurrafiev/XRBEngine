@@ -1,7 +1,7 @@
 /*******************************************************************************
  * MIT License
  *
- * Copyright (c) 2016 Ashur Rafiev
+ * Copyright (c) 2016, 2017 Ashur Rafiev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *******************************************************************************/
-package com.xrbpowered.gl.res;
+package com.xrbpowered.gl.res.builder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,21 +30,25 @@ import java.util.Scanner;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.xrbpowered.gl.res.StandardMeshBuilder.Vertex;
+import com.xrbpowered.gl.res.StaticMesh;
+import com.xrbpowered.gl.res.builder.AdvancedMeshBuilder.Vertex;
+import com.xrbpowered.gl.res.shaders.VertexInfo;
 import com.xrbpowered.utils.assets.AssetManager;
 
 public class ObjMeshLoader {
+	private static final float NORM_EPSILON = 0.01f;
 
 	private ArrayList<Vector3f> v = new ArrayList<>();
 	private ArrayList<Vector2f> vt = new ArrayList<>();
 	private ArrayList<Vector3f> vn = new ArrayList<>();
 
-	private StandardMeshBuilder builder = new StandardMeshBuilder();
+	private AdvancedMeshBuilder builder;
 	private HashMap<String, Vertex> indexMap = new HashMap<>();
 	
 	private final float scale;
 
-	private ObjMeshLoader(float scale) {
+	private ObjMeshLoader(AdvancedMeshBuilder builder, float scale) {
+		this.builder = builder;
 		this.scale = scale;
 	}
 	
@@ -59,18 +63,20 @@ public class ObjMeshLoader {
 	private Vertex getVertex(String sv) {
 		Vertex v = indexMap.get(sv);
 		if(v==null) {
-			v = new Vertex(); 
+			v = builder.addVertex(); 
 			String[] s = sv.split("\\/", 4);
 			v.setPosition(this.v.get(Integer.parseInt(s[0])-1));
 			if(s.length>1 && !s[1].isEmpty())
 				v.setTexCoord(this.vt.get(Integer.parseInt(s[1])-1));
 			if(s.length>2 && !s[2].isEmpty()) {
-				v.setNormal(this.vn.get(Integer.parseInt(s[2])-1));
-				if(v.normal.x==1f || v.normal.x==-1f)
+				Vector3f norm = this.vn.get(Integer.parseInt(s[2])-1);
+				v.setNormal(norm);
+				if(Math.abs(Math.abs(norm.x)-1f)<NORM_EPSILON)
 					v.setTangent(new Vector3f(0, 1, 0));
+				else
+					v.setTangent(new Vector3f(1, 0, 0));
 			}
 			// FIXME tangents
-			builder.add(v);
 		}
 		return v;
 	}
@@ -86,17 +92,17 @@ public class ObjMeshLoader {
 				vt.add(vec2(s));
 			else if("f".equals(s[0])) {
 				if(s.length==4)
-					builder.add(new StandardMeshBuilder.Triangle(getVertex(s[1]), getVertex(s[2]), getVertex(s[3])) /*.calcTangents()*/ );
+					builder.add(new AdvancedMeshBuilder.Triangle(getVertex(s[1]), getVertex(s[2]), getVertex(s[3])) /*.calcTangents()*/ );
 				else if(s.length==5)
-					builder.add(new StandardMeshBuilder.Quad(getVertex(s[1]), getVertex(s[2]), getVertex(s[3]), getVertex(s[4])) /*.calcTangents()*/ );
+					builder.add(new AdvancedMeshBuilder.Quad(getVertex(s[1]), getVertex(s[2]), getVertex(s[3]), getVertex(s[4])) /*.calcTangents()*/ );
 				else if(s.length==3)
-					builder.add(new StandardMeshBuilder.Edge(getVertex(s[1]), getVertex(s[2])));
+					builder.add(new AdvancedMeshBuilder.Edge(getVertex(s[1]), getVertex(s[2])));
 				else throw new RuntimeException("Unknown face type, can do only tris and quads.");
 			}
 			else if("o".equals(s[0]))
 				break;
 		}
-		return builder.create(false);
+		return builder.create();
 	}
 	
 	private static void skip(Scanner in) {
@@ -107,14 +113,13 @@ public class ObjMeshLoader {
 		}
 	}
 	
-	public static StaticMesh[] loadAll(String path, float scale) {
+	public static StaticMesh[] loadAll(String path, float scale, VertexInfo info, MeshBuilder.Options options) {
 		try {
 			ArrayList<StaticMesh> meshes = new ArrayList<>();
-			// Scanner in = new Scanner(f);
 			Scanner in = new Scanner(AssetManager.defaultAssets.openStream(path));
 			skip(in);
 			for(;;) {
-				StaticMesh m = new ObjMeshLoader(scale).load(in);
+				StaticMesh m = new ObjMeshLoader(new AdvancedMeshBuilder(info, options), scale).load(in);
 				if(m==null)
 					return meshes.toArray(null);
 				else
@@ -127,13 +132,12 @@ public class ObjMeshLoader {
 		}
 	}
 	
-	public static StaticMesh loadObj(String path, int objIndex, float scale) {
+	public static StaticMesh loadObj(String path, int objIndex, float scale, VertexInfo info, MeshBuilder.Options options) {
 		try {
-			// Scanner in = new Scanner(f);
 			Scanner in = new Scanner(AssetManager.defaultAssets.openStream(path));
 			for(int i=0; i<objIndex+1; i++)
 				skip(in);
-			return new ObjMeshLoader(scale).load(in);
+			return new ObjMeshLoader(new AdvancedMeshBuilder(info, options), scale).load(in);
 		}
 		catch(Exception e) {
 			e.printStackTrace();

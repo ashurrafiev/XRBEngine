@@ -31,89 +31,87 @@ import org.lwjgl.opengl.GL20;
 
 public class VertexInfo {
 
-	private int stride = 0;
-	private List<String> name = new ArrayList<>();
-	private List<Integer> elemCount = new ArrayList<>();
-	private List<Integer> type = new ArrayList<>();
-	private List<Boolean> norm = new ArrayList<>();
-	private List<Integer> offset = new ArrayList<>();
+	public static class Attribute {
+		public final String name;
+		public final int elemCount;
+		public final int offset;
+		public Attribute(String name, int elemCount, int offset) {
+			this.name = name;
+			this.elemCount = elemCount;
+			this.offset = offset;
+		}
+	}
 	
-	public VertexInfo addAttrib(String name, int elemCount, int glType, boolean norm) {
-		int size = sizeOf(glType);
-		if(size==0)
-			return this;
-		this.name.add(name);
-		this.elemCount.add(elemCount);
-		this.type.add(glType);
-		this.norm.add(norm);
-		this.offset.add(stride);
-		stride += size * elemCount;
+	private int skip = 0;
+	private List<Attribute> attribs = new ArrayList<>();
+	
+	public VertexInfo addAttrib(String name, int elemCount) {
+		this.attribs.add(new Attribute(name, elemCount, skip));
+		skip += elemCount;
 		return this;
 	}
 
-	public VertexInfo addFloatAttrib(String name, int elemCount) {
-		return addAttrib(name, elemCount, GL11.GL_FLOAT, false);
-	}
-
-	public VertexInfo addFloatAttrib(String name, int elemCount, boolean norm) {
-		return addAttrib(name, elemCount, GL11.GL_FLOAT, norm);
+	public int getStride() {
+		return skip * 4;
 	}
 	
-	public int getStride() {
-		return stride;
+	public int getSkip() {
+		return skip;
 	}
 	
 	public int getAttributeCount() {
-		return name.size();
+		return attribs.size();
+	}
+	
+	public Attribute get(int index) {
+		return attribs.get(index);
+	}
+
+	public int attributeIndex(String name) {
+		if(name==null)
+			return -1;
+		for(int i=0; i<getAttributeCount(); i++) {
+			Attribute a = attribs.get(i);
+			if(a.name!=null && name.equals(a.name))
+				return i;
+		}
+		return -1;
+	}
+
+	public Attribute get(String name) {
+		int index = attributeIndex(name);
+		if(index<0)
+			return null;
+		else
+			return get(index);
 	}
 	
 	public void initAttribPointers() {
-		for(int i=0; i<name.size(); i++) {
-			GL20.glVertexAttribPointer(i, elemCount.get(i), type.get(i), norm.get(i), stride, offset.get(i));
+		for(int i=0; i<getAttributeCount(); i++) {
+			Attribute a = attribs.get(i);
+			GL20.glVertexAttribPointer(i, a.elemCount, GL11.GL_FLOAT, false, getStride(), a.offset * 4);
 		}
 	}
 	
 	public void enableAttribs() {
-		for(int i=0; i<name.size(); i++) {
+		for(int i=0; i<getAttributeCount(); i++) {
 			GL20.glEnableVertexAttribArray(i);
 		}
 	}
 
 	public void disableAttribs() {
-		for(int i=0; i<name.size(); i++) {
+		for(int i=0; i<getAttributeCount(); i++) {
 			GL20.glDisableVertexAttribArray(i);
 		}
 	}
 
 	public int bindAttribLocations(int programId) {
-		for(int i=0; i<name.size(); i++) {
-			if(name.get(i)!=null)
-				GL20.glBindAttribLocation(programId, i, name.get(i));
+		for(int i=0; i<getAttributeCount(); i++) {
+			Attribute a = attribs.get(i);
+			if(a.name!=null)
+				GL20.glBindAttribLocation(programId, i, a.name);
 		}
-		return name.size();
-	}
-	
-	public static final int sizeOf(int glType) {
-		switch(glType) {
-			case GL11.GL_BYTE:
-			case GL11.GL_UNSIGNED_BYTE:
-				return 1;
-			case GL11.GL_2_BYTES:
-			case GL11.GL_SHORT:
-			case GL11.GL_UNSIGNED_SHORT:
-				return 2;
-			case GL11.GL_3_BYTES:
-				return 3;
-			case GL11.GL_4_BYTES:
-			case GL11.GL_INT:
-			case GL11.GL_UNSIGNED_INT:
-			case GL11.GL_FLOAT:
-				return 4;
-			case GL11.GL_DOUBLE:
-				return 8;
-			default:
-				return 0;
-		}
+		return getAttributeCount();
 	}
 	
 }
