@@ -120,6 +120,7 @@ public class GLFractal extends ExampleClient {
 	protected void destroyResources() {
 		super.destroyResources();
 		shader.destroy();
+		palette.destroy();
 	}
 	
 	@Override

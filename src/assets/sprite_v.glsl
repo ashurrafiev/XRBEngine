@@ -1,7 +1,7 @@
 /*******************************************************************************
  * MIT License
  *
- * Copyright (c) 2016 Ashur Rafiev
+ * Copyright (c) 2017 Ashur Rafiev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,42 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *******************************************************************************/
+ 
 #version 150 core
 
-uniform sampler2D palette;
-uniform int maxi = 256;
-uniform float aspect = 1;
-uniform float zoom = 1;
-uniform vec2 pivot = vec2(-1.15, -0.25);
+uniform vec2 screenSize;
 
-in vec2 pass_TextureCoord;
+in vec2 in_Position;
 
-out vec4 out_Color;
+in vec2 ins_Position;
+in vec2 ins_Size;
+in vec2 ins_RotationScale;
+in vec2 ins_TexCoord;
+in vec4 ins_Color;
+
+out vec2 pass_TexCoord;
+out vec4 pass_Color;
+
+mat2 rotationMatrix(float a) {
+	mat2 m = mat2(1);
+	m[0][0] = cos(a);
+	m[0][1] = sin(a);
+	m[1][0] = -m[0][1];
+	m[1][1] = m[0][0];
+	return m;
+}
 
 void main(void) {
-	float x0 = pivot.x+(pass_TextureCoord.x*2.0 - 1.0)*aspect*zoom;
-	float y0 = pivot.y+(pass_TextureCoord.y*2.0 - 1.0)*zoom;
+	vec2 pos = rotationMatrix(ins_RotationScale.x) * ins_RotationScale.y * in_Position * ins_Size + ins_Position;
 	
-	float x = 0.0;
-	float y = 0.0;
-	float xtemp;
-	int i = 0;
-	while((x*x+y*y <100.0) && (i<maxi)) {
-		xtemp = x*x - y*y + x0;
-		y = 2*x*y + y0;
-		x = xtemp;
-		i++;
-	}
+	gl_Position = vec4(
+		pos.x * 2.0 / screenSize.x - 1.0,
+		1.0 - pos.y * 2.0 / screenSize.y,
+		0.0, 1.0);
 	
-	float c; // = float(i)/float(maxi);
-	if(i<maxi) {
-		float logzn = log(x*x+y*y) / 2.0;
-		float nu = log(logzn/log(2.0)) / log(2.0);
-		c = (float(i+1) - nu) / float(maxi);
-	}
-	else {
-		c = 1.0;
-	}
-	out_Color = texture(palette, vec2(c, 0));
-	// out_Color = vec4(c, c, c, 1);
+	pass_TexCoord = in_Position * ins_Size + ins_TexCoord;
+	pass_Color = ins_Color;
 }
