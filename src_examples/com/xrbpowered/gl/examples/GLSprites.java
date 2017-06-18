@@ -18,9 +18,9 @@ import com.xrbpowered.utils.assets.FileAssetManager;
 
 public class GLSprites extends ExampleClient {
 
-	public static final int MAX_SPRITES = 10000;
+	public static final int MAX_SPRITES = 1000;
 	public static final int PARTICLE_SIZE = 64;
-	public static final float SPAWN_TIME = 0.0005f;
+	public static final float SPAWN_TIME = 0.005f;
 	
 	private static Random random = new Random();
 	private static int viewWidth, viewHeight;
