@@ -58,6 +58,8 @@ out vec4 out_Color;
 
 void main(void) {
 	vec4 t_diffuse = texture(texDiffuse, pass_TexCoord);
+	if(t_diffuse.a<0.5)
+		discard;
 	vec4 t_spec = texture(texSpecular, pass_TexCoord);
 
 	vec4 t_norm = texture(texNormal, pass_TexCoord);

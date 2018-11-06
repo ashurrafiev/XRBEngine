@@ -28,12 +28,14 @@ import java.util.Random;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import com.xrbpowered.gl.res.StaticMesh;
+import com.xrbpowered.gl.res.buffers.MultisampleBuffers;
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
 import com.xrbpowered.gl.res.builder.FastMeshBuilder;
@@ -71,7 +73,6 @@ public class GLLights extends ExampleClient {
 	protected GlobeShader globeShader;
 	
 	protected PostProcessShader postProc;
-	protected OffscreenBuffers interBuffers = null;
 
 	protected StaticMesh plane;
 	protected StaticMeshActor planeActor;
@@ -143,6 +144,8 @@ public class GLLights extends ExampleClient {
 		StandardShader.environment.ambientColor.set(0, 0, 0);
 		StandardShader.environment.lightColor.set(0.2f, 0.2f, 0.2f);
 		lightController = new Controller().setActor(lightActors[0]);
+		
+		GL11.glEnable(GL13.GL_MULTISAMPLE);
 	}
 		
 	private void updateInfo() {
@@ -156,8 +159,7 @@ public class GLLights extends ExampleClient {
 		switch(Keyboard.getEventKey()) {
 			case Keyboard.KEY_F4:
 				if(offscreenBuffers==null) {
-					offscreenBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), true);
-					interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
+					offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample);
 				}
 				else {
 					offscreenBuffers.destroy();
@@ -214,9 +216,7 @@ public class GLLights extends ExampleClient {
 		super.resizeResources();
 		if(offscreenBuffers!=null) {
 			offscreenBuffers.destroy();
-			offscreenBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), true);
-			interBuffers.destroy();
-			interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
+			offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample);
 		}
 	}
 	

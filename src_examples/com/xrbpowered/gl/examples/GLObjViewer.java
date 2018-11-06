@@ -40,7 +40,8 @@ import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class GLObjViewer extends ExampleClient {
 
-	public static final String INPUT_OBJ_FILE = "test.obj";
+	public static final String INPUT_OBJ_FILE = "../Prototypes/assets/leaves.obj";
+	//public static final String INPUT_OBJ_FILE = "test.obj";
 	
 	private StaticMesh mesh;
 	private Texture texture;
@@ -71,27 +72,29 @@ public class GLObjViewer extends ExampleClient {
 	@Override
 	protected void setupResources() {
 		super.setupResources();
-		texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422));
+		texture = new Texture("../Prototypes/assets/leaves.png", false, true);
+		//texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422));
 		normal = new Texture("normal.jpg");
 		
 //		mesh = StandardMeshBuilder.sphere(0.5f, 32);
 //		mesh = StandardMeshBuilder.cube(1f);
 		mesh = ObjMeshLoader.loadObj(INPUT_OBJ_FILE, 0, 1f, StandardShader.standardVertexInfo, null);
 		
-		meshActor = StaticMeshActor.make(scene, mesh, StandardShader.getInstance(), texture, plainSpecularTexture, normal);
+		meshActor = StaticMeshActor.make(scene, mesh, StandardShader.getInstance(), texture, BufferTexture.createPlainColor(4, 4, Color.BLACK), plainNormalTexture);
 		meshActor.position = new Vector3f(0, 0, -2);
 		meshActor.updateTransform();
 		
-		StandardShader.environment.ambientColor.set(0f, 0f, 0f);
-		StandardShader.environment.lightColor.set(1f, 1f, 1f);
+		StandardShader.environment.ambientColor.set(0.5f, 0.5f, 0.5f);
+		StandardShader.environment.lightColor.set(0.5f, 0.5f, 0.5f);
 		lightActor.rotation = new Vector3f((float)Math.PI, 0, 0);
 		lightActor.updateTransform();
 		
 		controller = new Controller().setActor(meshActor);
 		activeController = controller;
 		
-		uiDebugTitle = INPUT_OBJ_FILE;
+		uiDebugTitle = INPUT_OBJ_FILE.substring(INPUT_OBJ_FILE.lastIndexOf('/')+1);
 		uiDebugInfo = String.format("Triangles: %d", mesh.countTris());
+
 	}
 
 	@Override
@@ -123,13 +126,14 @@ public class GLObjViewer extends ExampleClient {
 	@Override
 	protected void drawObjects(RenderTarget target, float dt) {
 		if(rotating) {
-//			meshActor.rotation.y += ((float)(Math.PI / 18f)) * dt;
-//			meshActor.updateTransform();
-			lightActor.rotation.y += ((float)(Math.PI / 6f)) * dt;
-			lightActor.updateTransform();
+			meshActor.rotation.y += ((float)(Math.PI / 18f)) * dt;
+			meshActor.updateTransform();
+//			lightActor.rotation.y += ((float)(Math.PI / 6f)) * dt;
+//			lightActor.updateTransform();
 		}
 		
 		GL11.glEnable(GL11.GL_CULL_FACE);
+		//GL11.glDisable(GL11.GL_CULL_FACE);
 		meshActor.draw();
 	}
 	

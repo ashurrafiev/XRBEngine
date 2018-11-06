@@ -30,7 +30,6 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
@@ -112,7 +111,7 @@ public class GLPoints extends ExampleClient {
 			public void updateUniforms() {
 				uniform(projectionMatrixLocation, scene.activeCamera.getProjection());
 				uniform(viewMatrixLocation, scene.activeCamera.getView());
-				GL20.glUniform1f(screenHeightLocation, Display.getHeight());
+				GL20.glUniform1f(screenHeightLocation, getTargetHeight());
 			}
 		};
 		pointsRShader = new Shader(rInfo, "points_pv.glsl", "points_f.glsl") {
@@ -152,7 +151,7 @@ public class GLPoints extends ExampleClient {
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				uniform(projectionMatrixLocation, scene.activeCamera.getProjection());
 				uniform(viewMatrixLocation, scene.activeCamera.getView());
-				GL20.glUniform1f(screenHeightLocation, Display.getHeight());
+				GL20.glUniform1f(screenHeightLocation, getTargetHeight());
 			}
 			@Override
 			public void unuse() {

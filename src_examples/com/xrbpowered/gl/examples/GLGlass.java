@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
@@ -149,8 +148,8 @@ public class GLGlass extends ExampleClient {
 			planeActors2[i].updateTransform();
 		}
 		
-		interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
-		blurBuffers = new OffscreenBuffers(Display.getWidth()/6, Display.getHeight()/6, false);
+		interBuffers = new OffscreenBuffers(getTargetWidth(), getTargetHeight(), false);
+		blurBuffers = new OffscreenBuffers(getTargetWidth()/6, getTargetHeight()/6, false);
 		postProc = new PostProcessShader("post_blur_f.glsl") {
 			@Override
 			protected void storeUniformLocations() {
@@ -170,9 +169,9 @@ public class GLGlass extends ExampleClient {
 	protected void resizeResources() {
 		super.resizeResources();
 		interBuffers.destroy();
-		interBuffers = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
+		interBuffers = new OffscreenBuffers(getTargetWidth(), getTargetHeight(), false);
 		blurBuffers.destroy();
-		blurBuffers = new OffscreenBuffers(Display.getWidth()/6, Display.getHeight()/6, false);
+		blurBuffers = new OffscreenBuffers(getTargetWidth()/6, getTargetHeight()/6, false);
 	}
 	
 	@Override

@@ -357,6 +357,7 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 
 		if(offscreenBuffers!=null) {
+			offscreenBuffers.resolve();
 			target.use();
 			drawOffscreenBuffers(offscreenBuffers, target, dt);
 		}

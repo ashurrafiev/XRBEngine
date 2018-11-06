@@ -57,6 +57,10 @@ public abstract class RenderTarget {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo);
 	}
 	
+	public RenderTarget resolve() {
+		return this;
+	}
+	
 	public void destroy() {
 	}
 	

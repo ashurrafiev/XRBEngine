@@ -43,6 +43,7 @@ import org.lwjgl.util.glu.GLU;
 
 import com.xrbpowered.gl.SystemSettings.WindowMode;
 import com.xrbpowered.gl.res.buffers.MultisampleBuffers;
+import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
 import com.xrbpowered.gl.ui.UIManager;
 import com.xrbpowered.utils.JNIUtils;
@@ -104,7 +105,7 @@ public abstract class Client {
 			if(activeRenderer!=null)
 				activeRenderer.redraw(target, dt);
 			if(target.fbo!=0)
-				RenderTarget.blit(target, RenderTarget.primaryBuffer, false);
+				RenderTarget.blit(target.resolve(), RenderTarget.primaryBuffer, false);
 			if(activeUI!=null) {
 				RenderTarget.primaryBuffer.use();
 				activeUI.draw(Display.getWidth(), Display.getHeight());
@@ -134,11 +135,23 @@ public abstract class Client {
 	public RenderTarget createRenderTarget() {
 		if(target!=null && target.fbo!=0)
 			target.destroy();
+		int w = settings.scale(Display.getWidth());
+		int h = settings.scale(Display.getHeight());
 		if(settings.multisample>1)
-			target = new MultisampleBuffers(Display.getWidth(), Display.getHeight(), settings.multisample);
+			target = new MultisampleBuffers(w, h, settings.multisample); // TODO multisample with pixelScale
+		else if(settings.pixelScale>1)
+			target = new OffscreenBuffers(w, h, true);
 		else
 			target = RenderTarget.primaryBuffer;
 		return target;
+	}
+	
+	public int getTargetWidth() {
+		return target.getWidth();
+	}
+	
+	public int getTargetHeight() {
+		return target.getHeight();
 	}
 	
 	protected abstract void setupResources();

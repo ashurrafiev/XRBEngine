@@ -54,6 +54,7 @@ public class SystemSettings {
 	public WindowMode windowMode = WindowMode.windowed;
 	
 	public int multisample = 4;
+	public int pixelScale = 1;
 	public int maxFps = 120;
 	public boolean vsync = true;
 	
@@ -77,6 +78,10 @@ public class SystemSettings {
 		anisotropy = old.anisotropy;	
 		fov = old.fov;
 		uiScale = old.uiScale;
+	}
+	
+	public int scale(int size) {
+		return (int)(Math.ceil(size / (double)pixelScale));
 	}
 	
 	public SystemSettings setPath(String path, boolean saveNow) {

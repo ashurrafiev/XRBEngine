@@ -87,8 +87,8 @@ public class GLLife extends ExampleClient {
 		if(buffers[1]!=null)
 			buffers[1].destroy();
 		
-		int width = Display.getWidth();
-		int height = Display.getHeight();
+		int width = getTargetWidth();
+		int height = getTargetHeight();
 		buffers[0] = new OffscreenBuffers(width, height, false);
 		buffers[1] = new OffscreenBuffers(width, height, false);
 		targetBuffer = 1;
@@ -193,7 +193,7 @@ public class GLLife extends ExampleClient {
 					speed = speed * 2;
 				break;
 			case Keyboard.KEY_Q:
-				addGliders(Display.getWidth()/2, Display.getHeight()/2);
+				addGliders(getTargetWidth()/2, getTargetHeight()/2);
 				break;
 			default:
 				super.keyDown(key);
@@ -206,8 +206,8 @@ public class GLLife extends ExampleClient {
 		while(Mouse.next()) {
 			int button = Mouse.getEventButton();
 			if(button==0 && Mouse.getEventButtonState()) {
-				int x = Mouse.getEventX();
-				int y = Mouse.getEventY();
+				int x = Mouse.getEventX() * getTargetWidth() / Display.getWidth();
+				int y = Mouse.getEventY() * getTargetHeight() / Display.getHeight();
 				addGliders(x, y);
 			}
 		}

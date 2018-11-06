@@ -106,7 +106,7 @@ public class GLFractal extends ExampleClient {
 	private void resetBuffer() {
 		if(buffer!=null)
 			buffer.destroy();
-		buffer = new OffscreenBuffers(Display.getWidth()*multisample, Display.getHeight()*multisample, false);
+		buffer = new OffscreenBuffers(getTargetWidth()*multisample, getTargetHeight()*multisample, false);
 		redraw = true;
 	}
 	

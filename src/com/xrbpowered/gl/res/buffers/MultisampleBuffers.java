@@ -23,33 +23,57 @@
  *******************************************************************************/
 package com.xrbpowered.gl.res.buffers;
 
-import org.lwjgl.opengl.ARBFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL32;
 
-public class MultisampleBuffers extends RenderTarget {
+public class MultisampleBuffers extends OffscreenBuffers {
 
+	private int colorMSTexId;
+	private int depthMSTexId;
+	private OffscreenBuffers resolve;
+	
 	public MultisampleBuffers(int w, int h, int samples) {
 		super(GL30.glGenFramebuffers(), w, h);
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo);
-		create(w, h, samples);
+		create(w, h, samples, true);
+		resolve = new OffscreenBuffers(w, h, false);
 	}
 	
-	private static void create(int w, int h, int samples) {
-		int rbo = GL30.glGenRenderbuffers();
-		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, rbo); 
-		ARBFramebufferObject.glRenderbufferStorageMultisample(GL30.GL_RENDERBUFFER, samples, GL11.GL_RGBA8, w, h);
-		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
-		GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_RENDERBUFFER, rbo);
-
-		rbo = GL30.glGenRenderbuffers();
-		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, rbo); 
-		ARBFramebufferObject.glRenderbufferStorageMultisample(GL30.GL_RENDERBUFFER, samples, GL30.GL_DEPTH24_STENCIL8, w, h);
-		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
-		GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, rbo);
-
+	protected void create(int w, int h, int samples, boolean depthBuffer) {
+		colorMSTexId = GL11.glGenTextures();
+		GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, colorMSTexId);
+		GL32.glTexImage2DMultisample(GL32.GL_TEXTURE_2D_MULTISAMPLE, samples, GL11.GL_RGB, w, h, false);
+		GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, 0);
+		GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, colorMSTexId, 0);
+		
+		depthMSTexId = 0;
+		if(depthBuffer) {
+			depthMSTexId = GL11.glGenTextures();
+			GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, depthMSTexId);
+			GL32.glTexImage2DMultisample(GL32.GL_TEXTURE_2D_MULTISAMPLE, samples, GL30.GL_DEPTH24_STENCIL8, w, h, false);
+			GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, 0);
+			GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, depthMSTexId, 0);
+		}
 		checkStatus();
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+	}
+	
+	@Override
+	public OffscreenBuffers resolve() {
+		blit(this, resolve, false);
+		return resolve;
+	}
+	
+	public void bindColorBuffer(int index) {
+		resolve.bindColorBuffer(index);
+	}
+
+	public void bindDepthBuffer(int index) {
+		if(depthMSTexId>0) {
+			//GL13.glActiveTexture(GL13.GL_TEXTURE0 + index);
+			//GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, depthMSTexId);
+		}
 	}
 	
 	@Override
@@ -59,7 +83,8 @@ public class MultisampleBuffers extends RenderTarget {
 	
 	@Override
 	public void destroy() {
-		GL30.glDeleteFramebuffers(fbo);
+		resolve.destroy();
+		super.destroy();
 	}
 
 }

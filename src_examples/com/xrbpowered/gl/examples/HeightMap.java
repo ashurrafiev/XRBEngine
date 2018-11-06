@@ -25,17 +25,30 @@ package com.xrbpowered.gl.examples;
 import java.util.Random;
 
 import com.xrbpowered.utils.MathUtils;
+import com.xrbpowered.utils.RandomUtils;
 
 public class HeightMap {
 	
 	public final int size;
 	public Random random = new Random();
+	public long seed;
+	public long basex, basey;
 	public float[][] hmap;
-	
+
 	public HeightMap(int size) {
+		this(size, System.currentTimeMillis());
+	}
+
+	public HeightMap(int size, long seed) {
 		this.size = size;
+		this.seed = seed;
 		this.hmap= new float[size+1][size+1];
 		clear(0f);
+	}
+	
+	public void setBaseXY(long x, long y) {
+		this.basex = x;
+		this.basey = y;
 	}
 
 	public void clear(float h) {
@@ -55,6 +68,7 @@ public class HeightMap {
 	public void generateNoise(float[][] hmap, int step, float mean, float amp) {
 		for(int x=0; x<size+1; x+=step)
 			for(int y=0; y<size+1; y+=step) {
+				random.setSeed(RandomUtils.seedXY(seed+step, x+basex, y+basey));
 				hmap[x][y] = (float)random.nextDouble()*amp - amp*0.5f + mean;
 			}
 	}
@@ -78,10 +92,10 @@ public class HeightMap {
 			}
 	}
 	
-	public void generatePerlin(int steps, float mean, float amp, float damp, boolean cos) {
+	public void generatePerlin(float mean, float amp, float damp, boolean cos) {
 		int w = 4;
 		clear(mean);
-		for(int s=0; s<steps; s++) {
+		for(int s=size; s>2; s>>=1) {
 			float[][] h = new float[size+1][size+1];
 			generateNoise(h, w, 0f, amp);
 			if(w>1) {
@@ -98,6 +112,35 @@ public class HeightMap {
 			for(int y=0; y<size+1; y++) {
 				hmap[x][y] = (float)Math.floor(hmap[x][y]/step)*step;
 			}
+	}
+	
+	public void amplify(float power, float multiply, float add) {
+		for(int x=0; x<size+1; x++)
+			for(int y=0; y<size+1; y++) {
+				hmap[x][y] = (float)Math.pow(Math.abs(hmap[x][y]), power)*Math.signum(hmap[x][y])*multiply+add;
+			}
+	}
+	
+	public static HeightMap blend(HeightMap m0, HeightMap m1, HeightMap s) {
+		int size = s.size;
+		if(m0.size!=size || m1.size!=size)
+			throw new IllegalArgumentException("Map sizes do not match");
+		HeightMap map = new HeightMap(size);
+		for(int x=0; x<size+1; x++)
+			for(int y=0; y<size+1; y++) {
+				map.hmap[x][y] = MathUtils.lerp(m0.hmap[x][y], m1.hmap[x][y], s.hmap[x][y]);
+			}
+		return map;
+	}
+	
+	public static HeightMap scale(HeightMap m, int step, boolean cos) {
+		HeightMap map = new HeightMap(m.size*step);
+		for(int x=0; x<m.size+1; x++)
+			for(int y=0; y<m.size+1; y++) {
+				map.hmap[x*step][y*step] = m.hmap[x][y];
+			}
+		map.interpolate(map.hmap, step, cos);
+		return map;
 	}
 	
 }

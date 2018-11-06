@@ -33,8 +33,12 @@ import org.lwjgl.opengl.GL30;
 
 public class OffscreenBuffers extends RenderTarget {
 
-	private int colorTexId;
-	private int depthTexId;
+	protected int colorTexId;
+	protected int depthTexId;
+	
+	protected OffscreenBuffers(int fbo, int w, int h) {
+		super(fbo, w, h);
+	}
 	
 	public OffscreenBuffers(int w, int h, boolean depthBuffer, boolean depthTexture) {
 		super(GL30.glGenFramebuffers(), w, h);
@@ -46,7 +50,7 @@ public class OffscreenBuffers extends RenderTarget {
 		this(w, h, depthBuffer, false);
 	}
 
-	private void create(int w, int h, boolean depthBuffer, boolean depthTexture) {
+	protected void create(int w, int h, boolean depthBuffer, boolean depthTexture) {
 		colorTexId = GL11.glGenTextures();
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexId);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, w, h, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
@@ -88,6 +92,11 @@ public class OffscreenBuffers extends RenderTarget {
 	
 	public int getDepthTexId() {
 		return depthTexId;
+	}
+	
+	@Override
+	public OffscreenBuffers resolve() {
+		return this;
 	}
 	
 	public void bindColorBuffer(int index) {

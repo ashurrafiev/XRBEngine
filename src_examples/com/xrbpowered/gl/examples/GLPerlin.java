@@ -23,7 +23,6 @@
  *******************************************************************************/
 package com.xrbpowered.gl.examples;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL20;
 
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
@@ -86,7 +85,7 @@ public class GLPerlin extends ExampleClient {
 	private void resetBuffer() {
 		if(buffer!=null)
 			buffer.destroy();
-		buffer = new OffscreenBuffers(Display.getWidth(), Display.getHeight(), false);
+		buffer = new OffscreenBuffers(getTargetWidth(), getTargetHeight(), false);
 	}
 	
 	@Override
