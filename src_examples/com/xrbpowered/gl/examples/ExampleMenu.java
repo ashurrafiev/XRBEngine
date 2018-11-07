@@ -257,7 +257,16 @@ public class ExampleMenu implements InputHandler {
 			}
 		});
 		mb.addMenuItem(optFpsLimit);
-		
+
+		final MenuOptionItem optPixelScale = new MenuOptionItem(mb.getPageRoot(), "Pixel scaling", new String[] {"Off", "2", "3", "4"}, 0, 0) {
+			@Override
+			public void onChangeValue(int index) {
+				String s = getValueName();
+				settings.pixelScale = s.equals("Off") ? 1 : Integer.parseInt(s);
+			}
+		};
+		mb.addMenuItem(optPixelScale);
+
 		mb.addBlank(10);
 		UIPage qualitySubmenu = createQualitySubmenuPage(mb);
 		if(qualitySubmenu==null)

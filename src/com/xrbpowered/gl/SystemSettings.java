@@ -133,7 +133,7 @@ public class SystemSettings {
 	public void apply(Client client, SystemSettings old) throws LWJGLException {
 		if(displayChanged(old))
 			switchMode(client, true);
-		else if(this.multisample!=old.multisample)
+		else if(this.multisample!=old.multisample || this.pixelScale!=old.pixelScale)
 			client.createRenderTarget();
 		
 		if(this.vsync!=old.vsync)
