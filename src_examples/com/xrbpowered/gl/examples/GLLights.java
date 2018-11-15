@@ -54,8 +54,10 @@ public class GLLights extends ExampleClient {
 	public static final float PLANE_SIZE = 12f;
 	public static final int NUM_OBJECTS = 5;
 	public static final int NUM_LIGHTS = 8;
+	public static final float LIGHT_POWER = 8f;
 	
-	public static final Vector3f LIGHT_ATT = new Vector3f(1f, 0.14f, 0.07f);
+	//public static final Vector3f LIGHT_ATT = new Vector3f(1f, 0.14f, 0.07f);
+	public static final Vector3f LIGHT_ATT = new Vector3f(1f, 1f, 0.3f);
 	
 	public static class GlobeShader extends ActorShader {
 		public GlobeShader() {
@@ -101,7 +103,7 @@ public class GLLights extends ExampleClient {
 	@Override
 	protected void setupResources() {
 		super.setupResources();
-		postProc = new PostProcessShader("post_toxic_f.glsl");
+		postProc = new PostProcessShader("post_hdr_f.glsl");
 		
 		diffuse = BufferTexture.createPlainColor(4, 4, new Color(0x99bbdd));
 		specular = BufferTexture.createPlainColor(4, 4, new Color(0xaaaaaa));
@@ -138,7 +140,7 @@ public class GLLights extends ExampleClient {
 			lightActors[i].position.z = random.nextFloat()*PLANE_SIZE - PLANE_SIZE/2f;
 			lightActors[i].updateTransform();
 			Color color = Color.getHSBColor(i / (float) NUM_LIGHTS, 1f, 1f);
-			lightColors[i] = new Vector4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f);
+			lightColors[i] = new Vector4f(color.getRed() * LIGHT_POWER / 255f, color.getGreen() * LIGHT_POWER / 255f, color.getBlue() * LIGHT_POWER / 255f, 1f);
 		}
 		
 		StandardShader.environment.ambientColor.set(0, 0, 0);
@@ -159,7 +161,7 @@ public class GLLights extends ExampleClient {
 		switch(Keyboard.getEventKey()) {
 			case Keyboard.KEY_F4:
 				if(offscreenBuffers==null) {
-					offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample);
+					offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample, true);
 				}
 				else {
 					offscreenBuffers.destroy();
@@ -216,7 +218,7 @@ public class GLLights extends ExampleClient {
 		super.resizeResources();
 		if(offscreenBuffers!=null) {
 			offscreenBuffers.destroy();
-			offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample);
+			offscreenBuffers = new MultisampleBuffers(getTargetWidth(), getTargetHeight(), settings.multisample, true);
 		}
 	}
 	

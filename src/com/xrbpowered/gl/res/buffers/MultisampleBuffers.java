@@ -33,17 +33,21 @@ public class MultisampleBuffers extends OffscreenBuffers {
 	private int depthMSTexId;
 	private OffscreenBuffers resolve;
 	
-	public MultisampleBuffers(int w, int h, int samples) {
+	public MultisampleBuffers(int w, int h, int samples, boolean hdr) {
 		super(GL30.glGenFramebuffers(), w, h);
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo);
-		create(w, h, samples, true);
-		resolve = new OffscreenBuffers(w, h, false);
+		create(w, h, samples, true, hdr);
+		resolve = new OffscreenBuffers(w, h, false, hdr);
 	}
-	
-	protected void create(int w, int h, int samples, boolean depthBuffer) {
+
+	public MultisampleBuffers(int w, int h, int samples) {
+		this(w, h, samples, false);
+	}
+
+	protected void create(int w, int h, int samples, boolean depthBuffer, boolean hdr) {
 		colorMSTexId = GL11.glGenTextures();
 		GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, colorMSTexId);
-		GL32.glTexImage2DMultisample(GL32.GL_TEXTURE_2D_MULTISAMPLE, samples, GL11.GL_RGB, w, h, false);
+		GL32.glTexImage2DMultisample(GL32.GL_TEXTURE_2D_MULTISAMPLE, samples, hdr ? GL30.GL_RGB16F : GL11.GL_RGB, w, h, false);
 		GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, 0);
 		GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, colorMSTexId, 0);
 		
@@ -70,10 +74,8 @@ public class MultisampleBuffers extends OffscreenBuffers {
 	}
 
 	public void bindDepthBuffer(int index) {
-		if(depthMSTexId>0) {
-			//GL13.glActiveTexture(GL13.GL_TEXTURE0 + index);
-			//GL11.glBindTexture(GL32.GL_TEXTURE_2D_MULTISAMPLE, depthMSTexId);
-		}
+		if(depthMSTexId>0)
+			resolve.bindDepthBuffer(index);
 	}
 	
 	@Override
