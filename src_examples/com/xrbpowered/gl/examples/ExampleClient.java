@@ -42,6 +42,7 @@ import com.xrbpowered.gl.InputHandler;
 import com.xrbpowered.gl.Renderer;
 import com.xrbpowered.gl.SystemSettings;
 import com.xrbpowered.gl.SystemSettings.WindowMode;
+import com.xrbpowered.gl.res.buffers.MultisampleBuffers;
 import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
 import com.xrbpowered.gl.res.buffers.RenderTarget;
 import com.xrbpowered.gl.res.shaders.PostProcessRenderer;
@@ -79,6 +80,11 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 	public static Color UI_PANE_INFO_COLOR = Color.WHITE;
 	public static Color UI_PANE_GRAPH_COLOR = new Color(0x55999999, true);
 	
+	protected Renderer activeRenderer = null;
+	protected InputHandler activeInput = null;
+	protected UIManager activeUI = null;
+	private RenderTarget target = null;
+
 	protected UIManager ui = new UIManager();
 	protected UIPane uiDebugPane;
 	protected UIPane uiGraphPane;
@@ -162,6 +168,50 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		activeController = controller;
 		
 		createMenu();
+	}
+	
+	@Override
+	protected void update(float dt) {
+		if(activeInput!=null)
+			activeInput.processInput(dt);
+		updateFpsData(dt);
+		if(activeRenderer!=null)
+			activeRenderer.updateTime(dt);
+	}
+	
+	@Override
+	protected void render() {
+		target.use();
+		if(activeRenderer!=null)
+			activeRenderer.redraw(target);
+		if(target.fbo!=0)
+			RenderTarget.blit(target.resolve(), RenderTarget.primaryBuffer, false);
+		if(activeUI!=null) {
+			RenderTarget.primaryBuffer.use();
+			activeUI.draw(Display.getWidth(), Display.getHeight());
+		}
+	}
+	
+	@Override
+	public void createRenderTarget() {
+		if(target!=null && target.fbo!=0)
+			target.destroy();
+		int w = settings.scale(Display.getWidth());
+		int h = settings.scale(Display.getHeight());
+		if(settings.multisample>1)
+			target = new MultisampleBuffers(w, h, settings.multisample);
+		else if(settings.pixelScale>1)
+			target = new OffscreenBuffers(w, h, true);
+		else
+			target = RenderTarget.primaryBuffer;
+	}
+	
+	public int getTargetWidth() {
+		return target.getWidth();
+	}
+	
+	public int getTargetHeight() {
+		return target.getHeight();
 	}
 	
 	protected String getHelpString() {
@@ -327,13 +377,10 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		}
 	}
 	
-	@Override
-	public void redraw(RenderTarget target, float dt) {
+	protected void updateFpsData(float dt) {
 		if(dtlog.size()==MAX_DTLOG)
 			dtlog.removeFirst();
 		dtlog.add(dt);
-		if(uiGraphPane.isVisible())
-			uiGraphPane.repaint();
 		framesCount++;
 		fpsUpdateTime += dt;
 		if(fpsUpdateTime >= 0.25f) {
@@ -341,6 +388,16 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 			fpsUpdateTime = 0f;
 			framesCount = 0;
 		}
+	}
+	
+	@Override
+	public void updateTime(float dt) {
+	}
+	
+	@Override
+	public void redraw(RenderTarget target) {
+		if(uiGraphPane.isVisible())
+			uiGraphPane.repaint();
 		
 		RenderTarget drawTarget = target;
 		if(offscreenBuffers!=null) {
@@ -352,14 +409,14 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		if(wireframe)
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-		drawObjects(drawTarget, dt);
+		drawObjects(drawTarget);
 		if(wireframe)
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 
 		if(offscreenBuffers!=null) {
 			offscreenBuffers.resolve();
 			target.use();
-			drawOffscreenBuffers(offscreenBuffers, target, dt);
+			drawOffscreenBuffers(offscreenBuffers, target);
 		}
 	}
 	
@@ -373,10 +430,10 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		activeController.update(dt);
 	}
 	
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void drawObjects(RenderTarget target) {
 	}
 	
-	protected void drawOffscreenBuffers(OffscreenBuffers source, RenderTarget target, float dt) {
+	protected void drawOffscreenBuffers(OffscreenBuffers source, RenderTarget target) {
 	}
 	
 	protected void keyDown(int key) {

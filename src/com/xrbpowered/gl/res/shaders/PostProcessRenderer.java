@@ -89,11 +89,11 @@ public class PostProcessRenderer implements Renderer {
 		this.updatePerFrame = updatePerFrame;
 	}
 	
-	protected void redrawBackgroundBuffer(float dt) {
+	protected void redrawBackgroundBuffer() {
 		if(bgBuffer==null)
 			return;
 		bgBuffer.use();
-		parent.redraw(bgBuffer, dt);
+		parent.redraw(bgBuffer);
 		requestUpdate = false;
 	}
 	
@@ -115,9 +115,15 @@ public class PostProcessRenderer implements Renderer {
 	}
 	
 	@Override
-	public void redraw(RenderTarget target, float dt) {
+	public void updateTime(float dt) {
+		if(postProc!=null)
+			postProc.updateTime(dt);
+	}
+	
+	@Override
+	public void redraw(RenderTarget target) {
 		if(requestUpdate || updatePerFrame) {
-			redrawBackgroundBuffer(updatePerFrame ? dt : 0f);
+			redrawBackgroundBuffer(); //updatePerFrame ? dt : 0f);
 		}
 		
 		if(bgBuffer!=null) {
@@ -126,7 +132,7 @@ public class PostProcessRenderer implements Renderer {
 			else {
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				interBuffer.use();
-				postProc.draw(bgBuffer, dt);
+				postProc.draw(bgBuffer);
 				blit(interBuffer, target);
 			}
 			target.use();

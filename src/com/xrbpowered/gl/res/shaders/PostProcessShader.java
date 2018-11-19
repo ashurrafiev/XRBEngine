@@ -54,8 +54,11 @@ public class PostProcessShader extends Shader {
 		GL20.glUniform1f(timeLocation, time);
 	}
 	
-	public void draw(OffscreenBuffers src, float dt) {
+	public void updateTime(float dt) {
 		time += dt;
+	}
+	
+	public void draw(OffscreenBuffers src) {
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
 		createQuad();

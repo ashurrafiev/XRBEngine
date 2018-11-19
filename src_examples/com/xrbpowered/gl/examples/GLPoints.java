@@ -184,7 +184,7 @@ public class GLPoints extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void drawObjects(RenderTarget target) {
 		if(simpleMode) {
 			simplePointsShader.use();
 			simplePoints.draw();

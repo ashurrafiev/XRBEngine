@@ -181,7 +181,7 @@ public class GLLights extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void drawObjects(RenderTarget target) {
 		ActorPicker.instance.startPicking(Mouse.getX(), Mouse.getY(), RenderTarget.primaryBuffer);
 		for(int i=0; i<NUM_LIGHTS; i++)
 			ActorPicker.instance.drawActor(lightActors[i], i+1);
@@ -209,8 +209,13 @@ public class GLLights extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawOffscreenBuffers(OffscreenBuffers buffers, RenderTarget target, float dt) {
-		postProc.draw(buffers, dt);
+	public void updateTime(float dt) {
+		postProc.updateTime(dt);
+	}
+	
+	@Override
+	protected void drawOffscreenBuffers(OffscreenBuffers buffers, RenderTarget target) {
+		postProc.draw(buffers);
 	}
 	
 	@Override

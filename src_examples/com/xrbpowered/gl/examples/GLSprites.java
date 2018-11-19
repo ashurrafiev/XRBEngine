@@ -138,7 +138,8 @@ public class GLSprites extends ExampleClient {
 	private float nextSprite = 0f;
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void update(float dt) {
+		super.update(dt);
 		for(int i=0; i<particles.size(); i++) {
 			if(!particles.get(i).update(i, sprites, dt)) {
 				particles.remove(i--);
@@ -148,6 +149,10 @@ public class GLSprites extends ExampleClient {
 		while(nextSprite>=SPAWN_TIME && addParticle()) {
 			nextSprite -= SPAWN_TIME;
 		}
+	}
+	
+	@Override
+	protected void drawObjects(RenderTarget target) {
 		sprites.update(particles.size());
 		sprites.draw(particles.size());
 		uiDebugTitle = particles.size() + " quad sprites";

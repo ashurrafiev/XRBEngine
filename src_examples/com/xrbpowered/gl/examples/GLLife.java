@@ -202,6 +202,12 @@ public class GLLife extends ExampleClient {
 	}
 	
 	@Override
+	protected void update(float dt) {
+		super.update(dt);
+		
+	}
+	
+	@Override
 	protected void updateControllers(float dt) {
 		while(Mouse.next()) {
 			int button = Mouse.getEventButton();
@@ -214,11 +220,11 @@ public class GLLife extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	public void updateTime(float dt) {
 		if(!pause && dt>0f) {
 			for(int step=0; step<speed; step++) {
 				buffers[targetBuffer].use();
-				shader.draw(buffers[1-targetBuffer], 0f);
+				shader.draw(buffers[1-targetBuffer]);
 				targetBuffer = 1-targetBuffer;
 				turn++;
 			}
@@ -227,6 +233,10 @@ public class GLLife extends ExampleClient {
 		else {
 			uiDebugInfo = String.format("PAUSE  Turn: %d", turn);
 		}
+	}
+	
+	@Override
+	protected void drawObjects(RenderTarget target) {
 		OffscreenBuffers.blit(buffers[targetBuffer], target, false);
 	}
 	

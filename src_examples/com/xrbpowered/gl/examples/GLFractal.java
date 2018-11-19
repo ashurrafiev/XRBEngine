@@ -187,11 +187,11 @@ public class GLFractal extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void drawObjects(RenderTarget target) {
 		if(redraw) {
 			palette.bind(0);
 			buffer.use();
-			shader.draw(null, dt);
+			shader.draw(null);
 			redraw = false;
 		}
 		OffscreenBuffers.blit(buffer, target, true);

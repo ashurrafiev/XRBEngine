@@ -175,7 +175,7 @@ public class GLGlass extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void drawObjects(RenderTarget target) {
 		for(int i=0; i<NUM_PLANES; i++)
 			planeActors1[i].calcDepth();
 		Arrays.sort(planeActors1, depthSorter);
@@ -197,7 +197,7 @@ public class GLGlass extends ExampleClient {
 		OffscreenBuffers.blit(target, interBuffers, false);
 		
 		blurBuffers.use();
-		postProc.draw(interBuffers, dt);
+		postProc.draw(interBuffers);
 		
 		target.use();
 		glassShader.useBuffer(true);

@@ -125,14 +125,18 @@ public class GLFbxViewer extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void update(float dt) {
+		super.update(dt);
 		if(rotating) {
 //			meshActor.rotation.y += ((float)(Math.PI / 18f)) * dt;
 //			meshActor.updateTransform();
 			lightActor.rotation.y += ((float)(Math.PI / 6f)) * dt;
 			lightActor.updateTransform();
 		}
-		
+	}
+	
+	@Override
+	protected void drawObjects(RenderTarget target) {
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		meshActor.draw();
 	}

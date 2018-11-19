@@ -101,12 +101,16 @@ public class GLPerlin extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
-		buffer.use();
-		shader.draw(null, dt);
-		OffscreenBuffers.blit(buffer, target, true);
+	public void updateTime(float dt) {
 		pivoty += 20f*dt;
 		pivotx += 30f*dt;
+	}
+	
+	@Override
+	protected void drawObjects(RenderTarget target) {
+		buffer.use();
+		shader.draw(null);
+		OffscreenBuffers.blit(buffer, target, true);
 	}
 	
 	public static void main(String[] args) {

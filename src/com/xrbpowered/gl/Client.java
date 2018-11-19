@@ -42,10 +42,6 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
 import com.xrbpowered.gl.SystemSettings.WindowMode;
-import com.xrbpowered.gl.res.buffers.MultisampleBuffers;
-import com.xrbpowered.gl.res.buffers.OffscreenBuffers;
-import com.xrbpowered.gl.res.buffers.RenderTarget;
-import com.xrbpowered.gl.ui.UIManager;
 import com.xrbpowered.utils.JNIUtils;
 
 public abstract class Client {
@@ -53,10 +49,6 @@ public abstract class Client {
 	public static SystemSettings settings = SystemSettings.load("settings.json", null);
 	
 	protected DisplayMode displayMode;
-	protected Renderer activeRenderer = null;
-	protected InputHandler activeInput = null;
-	protected UIManager activeUI = null;
-	private RenderTarget target = null;
 	
 	public Client init(String windowTitle) {
 		JNIUtils.addLibraryPath("lib/native");
@@ -99,17 +91,8 @@ public abstract class Client {
 
 			time = Sys.getTime();
 			float dt = (time - prevTime) / (float) Sys.getTimerResolution();
-			if(activeInput!=null)
-				activeInput.processInput(dt);
-			target.use();
-			if(activeRenderer!=null)
-				activeRenderer.redraw(target, dt);
-			if(target.fbo!=0)
-				RenderTarget.blit(target.resolve(), RenderTarget.primaryBuffer, false);
-			if(activeUI!=null) {
-				RenderTarget.primaryBuffer.use();
-				activeUI.draw(Display.getWidth(), Display.getHeight());
-			}
+			update(dt);
+			render();
 			prevTime = time;
 
 			Display.update(false);
@@ -132,26 +115,13 @@ public abstract class Client {
 		System.exit(0);
 	}
 	
-	public RenderTarget createRenderTarget() {
-		if(target!=null && target.fbo!=0)
-			target.destroy();
-		int w = settings.scale(Display.getWidth());
-		int h = settings.scale(Display.getHeight());
-		if(settings.multisample>1)
-			target = new MultisampleBuffers(w, h, settings.multisample); // TODO multisample with pixelScale
-		else if(settings.pixelScale>1)
-			target = new OffscreenBuffers(w, h, true);
-		else
-			target = RenderTarget.primaryBuffer;
-		return target;
+	protected void update(float dt) {
 	}
 	
-	public int getTargetWidth() {
-		return target.getWidth();
+	protected void render() {
 	}
 	
-	public int getTargetHeight() {
-		return target.getHeight();
+	public void createRenderTarget() {
 	}
 	
 	protected abstract void setupResources();

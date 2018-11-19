@@ -45,7 +45,7 @@ public class GLObjViewer extends ExampleClient {
 	
 	private StaticMesh mesh;
 	private Texture texture;
-	private Texture normal;
+	//private Texture normal;
 	
 	private StaticMeshActor meshActor;
 	
@@ -74,7 +74,7 @@ public class GLObjViewer extends ExampleClient {
 		super.setupResources();
 		texture = new Texture("../Prototypes/assets/leaves.png", false, true);
 		//texture = BufferTexture.createPlainColor(4, 4, new Color(0xdd4422));
-		normal = new Texture("normal.jpg");
+		//normal = new Texture("normal.jpg");
 		
 //		mesh = StandardMeshBuilder.sphere(0.5f, 32);
 //		mesh = StandardMeshBuilder.cube(1f);
@@ -124,14 +124,18 @@ public class GLObjViewer extends ExampleClient {
 	}
 	
 	@Override
-	protected void drawObjects(RenderTarget target, float dt) {
+	protected void update(float dt) {
+		super.update(dt);
 		if(rotating) {
 			meshActor.rotation.y += ((float)(Math.PI / 18f)) * dt;
 			meshActor.updateTransform();
 //			lightActor.rotation.y += ((float)(Math.PI / 6f)) * dt;
 //			lightActor.updateTransform();
 		}
-		
+	}
+
+	@Override
+	protected void drawObjects(RenderTarget target) {
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		//GL11.glDisable(GL11.GL_CULL_FACE);
 		meshActor.draw();
