@@ -61,12 +61,20 @@ public class SpriteLayer {
 			instanceData[offs+11] = 1f;
 		}
 	}
-	
+
+	public void setSprite(int index, float x, float y, float size, float rotate, float scale, Vector4f color) {
+		setSprite(index, x, y, size, size, rotate, scale, size/2f, size/2f, color);
+	}
+
 	public void update(int count) {
+		if(count<=0)
+			return;
 		instBuffer.updateInstanceData(instanceData, count);
 	}
 	
 	public void draw(int count) {
+		if(count<=0)
+			return;
 		SpriteShader.getInstance().use();
 		texture.bind(0);
 		quad.enableDraw(null);

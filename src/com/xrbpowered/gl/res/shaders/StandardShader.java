@@ -110,14 +110,15 @@ public class StandardShader extends ActorShader {
 		uniform(GL20.glGetUniformLocation(pId, "fogColor"), color);
 		GL20.glUseProgram(0);
 	}
-	
+
+	private static Matrix3f norm = new Matrix3f();
+	private static Matrix4f model = new Matrix4f();
+
 	@Override
 	public void updateUniforms() {
 		super.updateUniforms();
-		
-		Matrix3f norm = new Matrix3f();
-		Matrix4f model = new Matrix4f(getActor().getTransform());
-		Matrix4f.mul(getActor().scene.activeCamera.getView(), model, model);
+
+		Matrix4f.mul(getActor().scene.activeCamera.getView(), getActor().getTransform(), model);
 		norm.m00 = model.m00;
 		norm.m01 = model.m01;
 		norm.m02 = model.m02;

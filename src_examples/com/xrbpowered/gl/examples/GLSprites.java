@@ -85,7 +85,7 @@ public class GLSprites extends ExampleClient {
 		super.setupResources();
 		sprites = new SpriteLayer(MAX_SPRITES, new BufferTexture(PARTICLE_SIZE, PARTICLE_SIZE, false, true, false) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
+			protected boolean updateBuffer(Graphics2D g2, int w, int h) {
 				BufferTexture.clearBuffer(g2, PARTICLE_SIZE, PARTICLE_SIZE);
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g2.setColor(Color.WHITE);

@@ -65,6 +65,7 @@ public class Controller {
 	}
 	
 	private static final Vector4f v = new Vector4f(0, 0, 0, 1);
+	private static final Matrix4f m = new Matrix4f();
 	
 	protected void applyVelocity(Vector3f position, Vector4f v) {
 		actor.position.x += v.x;
@@ -95,9 +96,8 @@ public class Controller {
 		
 		if(lookController) {
 			v.negate();
-			Matrix4f rotate = new Matrix4f();
-			Actor.rotateYawPitchRoll(actor.rotation, rotate);
-			Matrix4f.transform(rotate, v, v);
+			Actor.rotateYawPitchRoll(actor.rotation, m);
+			Matrix4f.transform(m, v, v);
 		}
 		applyVelocity(actor.position, v);
 

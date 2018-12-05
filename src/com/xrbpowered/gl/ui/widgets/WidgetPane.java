@@ -41,8 +41,8 @@ public class WidgetPane extends UIPane {
 		manager.add(this);
 		setTexture(new BufferTexture(w, h, false, false, staticBuffers) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
-				return updateBufferTexture(g2, getWidth(), getHeight());
+			protected boolean updateBuffer(Graphics2D g2, int w, int h) {
+				return updateBufferTexture(g2, w, h);
 			}
 		});
 		setAnchor(x, y);

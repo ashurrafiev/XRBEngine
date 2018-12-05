@@ -66,10 +66,17 @@ public class HeightMap {
 	}
 
 	public void generateNoise(float[][] hmap, int step, float mean, float amp) {
+		generateNoise(hmap, false, step, mean, amp);
+	}
+
+	public void generateNoise(float[][] hmap, boolean wrap, int step, float mean, float amp) {
 		for(int x=0; x<size+1; x+=step)
 			for(int y=0; y<size+1; y+=step) {
 				random.setSeed(RandomUtils.seedXY(seed+step, x+basex, y+basey));
-				hmap[x][y] = (float)random.nextDouble()*amp - amp*0.5f + mean;
+				if(wrap && (x==size || y==size))
+					hmap[x][y] = hmap[x==size ? 0 : x][y==size ? 0 : y];
+				else
+					hmap[x][y] = (float)random.nextDouble()*amp - amp*0.5f + mean;
 			}
 	}
 
@@ -92,12 +99,12 @@ public class HeightMap {
 			}
 	}
 	
-	public void generatePerlin(float mean, float amp, float damp, boolean cos) {
+	public void generatePerlin(boolean wrap, float mean, float amp, float damp, boolean cos) {
 		int w = 4;
 		clear(mean);
 		for(int s=size; s>2; s>>=1) {
 			float[][] h = new float[size+1][size+1];
-			generateNoise(h, w, 0f, amp);
+			generateNoise(h, wrap, w, 0f, amp);
 			if(w>1) {
 				interpolate(h, w, cos);
 			}
@@ -105,6 +112,10 @@ public class HeightMap {
 			w *= 2;
 			amp *= damp;
 		}
+	}
+
+	public void generatePerlin(float mean, float amp, float damp, boolean cos) {
+		generatePerlin(false, mean, amp, damp, cos);
 	}
 
 	public void makeSteps(float step) {

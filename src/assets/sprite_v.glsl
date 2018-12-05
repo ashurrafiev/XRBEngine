@@ -25,6 +25,7 @@
 #version 150 core
 
 uniform vec2 screenSize;
+uniform mat4 viewMatrix;
 
 in vec2 in_Position;
 
@@ -48,10 +49,11 @@ mat2 rotationMatrix(float a) {
 
 void main(void) {
 	vec2 pos = rotationMatrix(ins_RotationScale.x) * ins_RotationScale.y * in_Position * ins_Size + ins_Position;
+	vec4 vpos = viewMatrix * vec4(pos.x - screenSize.x/2.0, -pos.y + screenSize.y/2.0, 0.0, 1.0);
 	
 	gl_Position = vec4(
-		pos.x * 2.0 / screenSize.x - 1.0,
-		1.0 - pos.y * 2.0 / screenSize.y,
+		vpos.x * 2.0 / screenSize.x,
+		vpos.y * 2.0 / screenSize.y,
 		0.0, 1.0);
 	
 	pass_TexCoord = in_Position * ins_Size + ins_TexCoord;

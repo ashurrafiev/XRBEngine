@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src_examples"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/javax.json-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/lwjgl_util.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl_util.jar" sourcepath="lib_src/lwjgl-source-2.9.3.zip"/>
 	<classpathentry kind="lib" path="lib/lwjgl.jar" sourcepath="lib_src/lwjgl-source-2.9.3.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

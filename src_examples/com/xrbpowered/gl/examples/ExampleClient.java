@@ -136,14 +136,14 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 		
 		uiDebugPane = new UIPane(ui, new BufferTexture(UI_PANE_WIDTH, UI_PANE_HEIGHT, false, false, true) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
-				return updateDebugInfoBuffer(g2, getWidth(), getHeight());
+			protected boolean updateBuffer(Graphics2D g2, int w, int h) {
+				return updateDebugInfoBuffer(g2, w, h);
 			}
 		}).setAnchor(UI_PANE_X, UI_PANE_Y);
 		uiGraphPane = new  UIPane(ui, new BufferTexture(UI_PANE_WIDTH, UI_PANE_GRAPH_HEIGHT, false, false, true) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
-				return updateGraphBuffer(g2, getWidth(), getHeight());
+			protected boolean updateBuffer(Graphics2D g2, int w, int h) {
+				return updateGraphBuffer(g2, w, h);
 			}
 		}).setAnchor(UI_PANE_X, UI_PANE_Y+UI_PANE_HEIGHT+UI_PANE_GRAPH_Y);
 		uiGraphPane.setVisible(false);

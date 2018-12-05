@@ -44,11 +44,11 @@ public abstract class AbstractLoadScreen {
 		this.clearColor = clearColor;
 		uiPane = new UIPane(ui, new BufferTexture(w, h, false, false, maxProgress>0) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
+			protected boolean updateBuffer(Graphics2D g2, int w, int h) {
 				float prog = maxProgress>0 ? (float)progress/(float)maxProgress : 0f;
 				if(prog>1f)
 					prog = 1f;
-				return AbstractLoadScreen.this.updateBuffer(g2, getWidth(), getHeight(), (System.currentTimeMillis()-timeStart)/1000f, prog);
+				return AbstractLoadScreen.this.updateBuffer(g2, w, h, (System.currentTimeMillis()-timeStart)/1000f, prog);
 			}
 		});
 	}

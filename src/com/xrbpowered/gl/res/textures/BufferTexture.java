@@ -39,21 +39,36 @@ public abstract class BufferTexture extends Texture {
 	protected BufferedImage imgBuffer = null;
 	private IntBuffer intBuffer = null;
 	private int[] pixels = null;
-	private boolean staticBuffers = false;
+	private final boolean staticBuffers;
+	private final boolean opaque; 
 	
-	public BufferTexture(int w, int h, boolean wrap, boolean filter, boolean staticBuffers) {
+	protected BufferTexture(boolean create, int w, int h, boolean opaque, boolean wrap, boolean filter, boolean staticBuffers) {
 		this.staticBuffers = staticBuffers;
+		this.opaque = opaque;
 		this.width = w;
 		this.height = h;
+		if(create)
+			create(wrap, filter);
+	}
+
+	protected BufferTexture(int w, int h, boolean opaque, boolean wrap, boolean filter, boolean staticBuffers) {
+		this(true, w, h, opaque, wrap, filter, staticBuffers);
+	}
+
+	public BufferTexture(int w, int h, boolean wrap, boolean filter, boolean staticBuffers) {
+		this(true, w, h, false, wrap, filter, staticBuffers);
+	}
+	
+	protected void create(boolean wrap, boolean filter) {
 		createBuffers();
-		updateBuffer((Graphics2D) imgBuffer.getGraphics());
+		updateBuffer((Graphics2D) imgBuffer.getGraphics(), width, height);
 		create(imgBuffer, intBuffer, wrap, filter);
 		if(!staticBuffers)
 			destroyBuffers();
 	}
-	
+
 	private void createBuffers() {
-		this.imgBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		this.imgBuffer = new BufferedImage(width, height, opaque ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
 		this.intBuffer = ByteBuffer.allocateDirect(4 * width * height).order(ByteOrder.nativeOrder()).asIntBuffer();
 	}
 	
@@ -63,13 +78,13 @@ public abstract class BufferTexture extends Texture {
 		this.pixels = null;
 	}
 	
-	protected abstract boolean updateBuffer(Graphics2D g2);
+	protected abstract boolean updateBuffer(Graphics2D g2, int width, int height);
 	
 	public void update() {
 		if(this.imgBuffer==null)
 			createBuffers();
 		
-		if(updateBuffer((Graphics2D) imgBuffer.getGraphics())) {
+		if(updateBuffer((Graphics2D) imgBuffer.getGraphics(), width, height)) {
 			pixels = imgBuffer.getRGB(0, 0, width, height, pixels, 0, width);
 			intBuffer.put(pixels);
 			intBuffer.flip();
@@ -96,9 +111,9 @@ public abstract class BufferTexture extends Texture {
 	public static BufferTexture createPlainColor(int w, int h, final Color color, boolean wrap, boolean filter) {
 		return new BufferTexture(w, h, true, wrap, filter) {
 			@Override
-			protected boolean updateBuffer(Graphics2D g2) {
+			protected boolean updateBuffer(Graphics2D g2, int width, int height) {
 				g2.setBackground(color);
-				g2.clearRect(0, 0, getWidth(), getHeight());
+				g2.clearRect(0, 0,width, height);
 				return true;
 			}
 		};

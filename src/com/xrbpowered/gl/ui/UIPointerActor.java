@@ -39,7 +39,7 @@ public class UIPointerActor extends Actor {
 			super(w, h, false, false, staticBuffers);
 		}
 		@Override
-		protected boolean updateBuffer(Graphics2D g2) {
+		protected boolean updateBuffer(Graphics2D g2, int w, int h) {
 			return UIPointerActor.this.updateBuffer(g2);
 		}
 	}
