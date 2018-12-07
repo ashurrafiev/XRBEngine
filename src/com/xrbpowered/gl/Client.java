@@ -42,6 +42,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
 import com.xrbpowered.gl.SystemSettings.WindowMode;
+import com.xrbpowered.gl.res.buffers.RenderTarget;
 import com.xrbpowered.utils.JNIUtils;
 
 public abstract class Client {
@@ -92,7 +93,7 @@ public abstract class Client {
 			time = Sys.getTime();
 			float dt = (time - prevTime) / (float) Sys.getTimerResolution();
 			update(dt);
-			render();
+			render(RenderTarget.primaryBuffer);
 			prevTime = time;
 
 			Display.update(false);
@@ -118,7 +119,7 @@ public abstract class Client {
 	protected void update(float dt) {
 	}
 	
-	protected void render() {
+	public void render(RenderTarget primaryTarget) {
 	}
 	
 	public void createRenderTarget() {

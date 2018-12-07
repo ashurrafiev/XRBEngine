@@ -55,6 +55,7 @@ import com.xrbpowered.gl.scene.Controller;
 import com.xrbpowered.gl.scene.DirectionalLightActor;
 import com.xrbpowered.gl.scene.Projection;
 import com.xrbpowered.gl.scene.Scene;
+import com.xrbpowered.gl.scene.Screenshot;
 import com.xrbpowered.gl.ui.UIManager;
 import com.xrbpowered.gl.ui.UIPane;
 import com.xrbpowered.gl.ui.UIShader;
@@ -180,14 +181,14 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 	}
 	
 	@Override
-	protected void render() {
+	public void render(RenderTarget primaryTarget) {
 		target.use();
 		if(activeRenderer!=null)
 			activeRenderer.redraw(target);
-		if(target.fbo!=0)
-			RenderTarget.blit(target.resolve(), RenderTarget.primaryBuffer, false);
+		if(target.fbo!=primaryTarget.fbo)
+			RenderTarget.blit(target.resolve(), primaryTarget, false);
 		if(activeUI!=null) {
-			RenderTarget.primaryBuffer.use();
+			primaryTarget.use();
 			activeUI.draw(Display.getWidth(), Display.getHeight());
 		}
 	}
@@ -441,6 +442,9 @@ public class ExampleClient extends Client implements Renderer, InputHandler {
 			case Keyboard.KEY_ESCAPE:
 				activeController.setMouseLook(false);
 				showMenu();
+				break;
+			case Keyboard.KEY_F12:
+				new Screenshot(this).save(".");
 				break;
 			case Keyboard.KEY_F1:
 				settings.maxFps = 120 - settings.maxFps;
