@@ -96,6 +96,7 @@ public class Controller {
 		
 		if(lookController) {
 			v.negate();
+			m.setIdentity();
 			Actor.rotateYawPitchRoll(actor.rotation, m);
 			Matrix4f.transform(m, v, v);
 		}

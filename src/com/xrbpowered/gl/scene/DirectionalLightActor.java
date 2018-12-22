@@ -39,6 +39,7 @@ public class DirectionalLightActor extends Actor {
 	
 	@Override
 	public void updateTransform() {
+		m.setIdentity();
 		Actor.rotateYawPitchRoll(this.rotation, m);
 		d.set(0, 0, 1);
 		Matrix4f.transform(m, d, d);
