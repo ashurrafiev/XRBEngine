@@ -43,6 +43,10 @@ public abstract class Shader {
 	public final VertexInfo info;
 	protected int pId;
 	
+	protected Shader(VertexInfo info) {
+		this.info = info;
+	}
+	
 	public Shader(VertexInfo info, String pathVS, String pathFS) {
 //		System.out.println("Compile: "+pathVS+", "+pathFS);
 		this.info = info;
@@ -93,7 +97,7 @@ public abstract class Shader {
 	}
 	
 	protected int bindAttribLocations() {
-		return info.bindAttribLocations(pId);
+		return (info==null) ? 0 : info.bindAttribLocations(pId);
 	}
 	
 	protected void initSamplers(String[] names) {
@@ -104,7 +108,7 @@ public abstract class Shader {
 		GL20.glUseProgram(0);
 	}
 	
-	private static int loadShader(String path, int type) {
+	public static int loadShader(String path, int type) {
 		if(path==null)
 			return 0;
 		int shaderId = 0;

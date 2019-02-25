@@ -50,11 +50,15 @@ public abstract class Client {
 	public static SystemSettings settings = SystemSettings.load("settings.json", null);
 	
 	protected DisplayMode displayMode;
-	
+
 	public Client init(String windowTitle) {
+		return init(windowTitle, 3, 3);
+	}
+
+	public Client init(String windowTitle, int glMajor, int glMinor) {
 		JNIUtils.addLibraryPath("lib/native");
 		try {
-			setupOpenGL(windowTitle);
+			setupOpenGL(windowTitle, glMajor, glMinor);
 			setupResources();
 			printInfo();
 		} catch (LWJGLException e) {
@@ -64,9 +68,9 @@ public abstract class Client {
 		return this;
 	}
 	
-	protected void setupOpenGL(String windowTitle) throws LWJGLException {
+	protected void setupOpenGL(String windowTitle, int glMajor, int glMinor) throws LWJGLException {
 		PixelFormat pixelFormat = new PixelFormat();
-		ContextAttribs contextAtrributes = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
+		ContextAttribs contextAtrributes = new ContextAttribs(glMajor, glMinor).withForwardCompatible(true).withProfileCore(true);
 
 		Display.setTitle(windowTitle);
 		if(settings.windowMode==WindowMode.fullscreen) {
@@ -193,7 +197,22 @@ public abstract class Client {
 		System.out.println("\n--------------------------------\nSYSTEM INFO\n--------------------------------");
 		System.out.println("Device: " + GL11.glGetString(GL11.GL_RENDERER));
 		System.out.println("Device vendor: " + GL11.glGetString(GL11.GL_VENDOR));
-		System.out.println("OpenGL version (requested 3.3): " + GL11.glGetString(GL11.GL_VERSION));
+		System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+		
+		System.out.printf("Max texture size: %d\n", GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE));
+		System.out.printf("Max MSAA samples: %d\n", GL11.glGetInteger(GL30.GL_MAX_SAMPLES));
+		System.out.printf("Max anisotropy: %d\n", GL11.glGetInteger(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+		System.out.printf("Max texture array layers: %d\n", GL11.glGetInteger(GL30.GL_MAX_ARRAY_TEXTURE_LAYERS));
+		System.out.printf("Max vertex attribs: %d\n", GL11.glGetInteger(GL20.GL_MAX_VERTEX_ATTRIBS));
+		System.out.printf("Max uniform components: %d\n", GL11.glGetInteger(GL20.GL_MAX_VERTEX_UNIFORM_COMPONENTS));
+		System.out.printf("Available video memory (NVIDIA only): %.1f%%\n", getAvailMemoryNVidia()*100f);
+		System.out.println("--------------------------------");
+		System.out.println();
+		
+		GL11.glGetError(); // clear errors
+	}
+	
+	public static void printFulscreenModes() {
 		System.out.println("Available fullscreen modes:");
 		DisplayMode desktop = Display.getDesktopDisplayMode();
 		try {
@@ -222,18 +241,6 @@ public abstract class Client {
 		catch(LWJGLException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.printf("Max texture size: %d\n", GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE));
-		System.out.printf("Max MSAA samples: %d\n", GL11.glGetInteger(GL30.GL_MAX_SAMPLES));
-		System.out.printf("Max anisotropy: %d\n", GL11.glGetInteger(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
-		System.out.printf("Max texture array layers: %d\n", GL11.glGetInteger(GL30.GL_MAX_ARRAY_TEXTURE_LAYERS));
-		System.out.printf("Max vertex attribs: %d\n", GL11.glGetInteger(GL20.GL_MAX_VERTEX_ATTRIBS));
-		System.out.printf("Max uniform components: %d\n", GL11.glGetInteger(GL20.GL_MAX_VERTEX_UNIFORM_COMPONENTS));
-		System.out.printf("Available video memory (NVIDIA only): %.1f%%\n", getAvailMemoryNVidia()*100f);
-		System.out.println("--------------------------------");
-		System.out.println();
-		
-		GL11.glGetError(); // clear errors
 	}
 	
 	public float getAspectRatio() {
