@@ -56,6 +56,16 @@ public class FastMeshBuilder extends MeshBuilder {
 		this.vertexData = new float[numVertices * info.getSkip()];
 		this.indexData = new short[numIndices];
 	}
+
+	public FastMeshBuilder(VertexInfo info, Options options, float[] vertexData, int numIndices) {
+		super(info, options);
+		this.vertexData = vertexData;
+		this.indexData = new short[numIndices];
+	}
+
+	public float[] getVertexData() {
+		return vertexData;
+	}
 	
 	public Vertex getVertex(int index) {
 		return vertexRef.setIndex(index);
@@ -93,7 +103,11 @@ public class FastMeshBuilder extends MeshBuilder {
 	public StaticMesh create() {
 		return new StaticMesh(info, vertexData, indexData);
 	}
-	
+
+	public StaticMesh create(int verticesPerElement) {
+		return new StaticMesh(info, vertexData, indexData, verticesPerElement, false);
+	}
+
 	public static StaticMesh cube(float size, VertexInfo info, Options options) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();

@@ -30,6 +30,8 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import com.xrbpowered.utils.MathUtils;
+
 public class Controller {
 
 	public float moveSpeed = 3.0f;
@@ -37,6 +39,7 @@ public class Controller {
 	
 	public boolean forceForward = false;
 	public boolean canStrafe = true;
+	public boolean limitRotation = false;
 	
 	private boolean mouseLook = false;
 	private boolean lookController = false;
@@ -119,9 +122,13 @@ public class Controller {
 			Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
 		}
 		
+		
 		if(lookController)
 			v.negate();
 		actor.rotation.x += v.x;
+		if(limitRotation) {
+			actor.rotation.x = (float) MathUtils.snap(actor.rotation.x, -Math.PI/2.0, Math.PI/2.0);
+		}
 		actor.rotation.y += v.y;
 		
 		actor.updateTransform();
