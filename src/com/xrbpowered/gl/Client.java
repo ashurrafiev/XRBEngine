@@ -107,8 +107,8 @@ public abstract class Client {
 			else if(settings.maxFps>0)
 				Display.sync(settings.maxFps);
 			
-			while(Mouse.next());
-			while(Keyboard.next());
+			while(Mouse.next()) {}
+			while(Keyboard.next()) {}
 			Display.processMessages();
 		}
 		exit();

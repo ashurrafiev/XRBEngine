@@ -54,7 +54,7 @@ public class StandardShader extends ActorShader {
 			for(StandardShader shader : shaders)
 				shader.setFog(near, far, color);
 		}
-	};
+	}
 	public static final StandardShaderEnvironment environment = new StandardShaderEnvironment();
 	
 	public static final String[] SAMLER_NAMES = {"texDiffuse", "texSpecular", "texNormal"};
